@@ -10,6 +10,9 @@ next.user-config.*
 # Environment variables
 .env*.local
 
+# Lockfile de npm (este repo usa pnpm; ver pnpm-lock.yaml)
+package-lock.json
+
 # Common ignores
 node_modules/
 .next/
