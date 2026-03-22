@@ -37,9 +37,14 @@ import { toast } from "sonner"
 import { useUIFeedback } from "@/hooks/useUIFeedback"
 import type { DashboardProps, Transaction, Employee, ContractEvent } from "@/types/dashboard"
 import { FeedSidebar } from "@/components/dashboard/FeedSidebar"
+import { useLanguage } from "@/components/language-provider"
+import { translations } from "@/lib/translations"
+import { LanguageToggle } from "@/components/language-toggle"
 
 export function Dashboard({ role, onLogout }: DashboardProps) {
   const { notifyWIP } = useUIFeedback()
+  const { lang } = useLanguage()
+  const t = translations[lang]
   const [selectedQuadrant, setSelectedQuadrant] = useState<number | null>(null)
   const [showReceipt, setShowReceipt] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
@@ -290,12 +295,15 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">Alebrije Flow</h1>
-                <p className="text-xs text-muted-foreground">Sistema de Nomina</p>
+                <h1 className="text-xl font-bold text-foreground">{t.appName}</h1>
+                <p className="text-xs text-muted-foreground">{t.appSubtitle}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-4">
+              {/* Language Toggle */}
+              <LanguageToggle />
+
               {/* Feed Toggle */}
               <button
                 onClick={() => setShowFeed(prev => !prev)}
@@ -306,7 +314,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                 }`}
               >
                 <Terminal className="w-4 h-4" />
-                <span className="text-sm hidden sm:inline">Feed</span>
+                <span className="text-sm hidden sm:inline">{t.feedLabel}</span>
                 <KeyboardHint keys="F" />
               </button>
 
@@ -319,7 +327,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                   <UserCircle className="w-4 h-4 text-neon-violet" />
                 )}
                 <span className="text-sm font-medium text-foreground">
-                  {isAdmin ? "Administrador" : "Empleado"}
+                  {isAdmin ? t.rolAdmin : t.rolEmployee}
                 </span>
               </div>
               <button
@@ -327,7 +335,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
               >
                 <LogOut className="w-4 h-4" />
-                <span className="text-sm">Salir</span>
+                <span className="text-sm">{t.salir}</span>
               </button>
             </div>
           </div>
@@ -343,7 +351,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
               <div className="glass-card rounded-xl p-4 flex items-center justify-center gap-3 border border-primary/30">
                 <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
                 <span className="text-sm text-muted-foreground">
-                  Conectando con el contrato inteligente... Esperando Esencia
+                  {t.conectando}
                 </span>
               </div>
             </div>
@@ -360,9 +368,9 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                   <>
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Saldo en Custodia</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t.saldoCustodia}</p>
                         <p className="text-2xl font-bold text-foreground">$4,250,000</p>
-                        <p className="text-xs text-muted-foreground">MXN Tokenizado</p>
+                        <p className="text-xs text-muted-foreground">{t.saldoSub}</p>
                       </div>
                       <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
                         <Wallet className="w-5 h-5 text-primary" />
@@ -379,7 +387,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                     </div>
                     <div className="flex items-center gap-1 mt-2 text-xs text-green-500">
                       <TrendingUp className="w-3 h-3" />
-                      <span>+2.4% rendimiento</span>
+                      <span>{t.rendimiento}</span>
                     </div>
                   </>
                 )}
@@ -393,9 +401,9 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                   <>
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Proxima Dispersion</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t.proximaDispersion}</p>
                         <p className="text-2xl font-bold text-foreground">15 Ene 2024</p>
-                        <p className="text-xs text-muted-foreground">Nomina Quincenal</p>
+                        <p className="text-xs text-muted-foreground">{t.nominaQuincenal}</p>
                       </div>
                       <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
                         <Calendar className="w-5 h-5 text-accent" />
@@ -405,7 +413,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       <div className="flex-1 h-2 bg-secondary rounded-full overflow-hidden">
                         <div className="h-full w-3/4 bg-gradient-to-r from-primary to-accent rounded-full" />
                       </div>
-                      <span className="text-xs text-muted-foreground">3 dias</span>
+                      <span className="text-xs text-muted-foreground">{t.diasRestantes}</span>
                     </div>
                     <div className="flex items-center gap-1 mt-2 text-xs text-accent">
                       <Globe className="w-3 h-3" />
@@ -423,9 +431,9 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                   <>
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground mb-1">Headcount Total</p>
+                        <p className="text-sm text-muted-foreground mb-1">{t.headcount}</p>
                         <p className="text-2xl font-bold text-foreground">1,247</p>
-                        <p className="text-xs text-muted-foreground">Empleados activos</p>
+                        <p className="text-xs text-muted-foreground">{t.empleadosActivos}</p>
                       </div>
                       <div className="w-10 h-10 rounded-lg bg-neon-violet/20 flex items-center justify-center">
                         <Users className="w-5 h-5 text-neon-violet" />
@@ -446,7 +454,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                     </div>
                     <div className="flex items-center gap-1 mt-2 text-xs text-green-500">
                       <ArrowUpRight className="w-3 h-3" />
-                      <span>+12 este mes</span>
+                      <span>{t.esteMes}</span>
                     </div>
                   </>
                 )}
@@ -474,11 +482,11 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground flex items-center">
-                          {isAdmin ? "Transacciones y Movimientos" : "Mis Recibos"}
+                          {isAdmin ? t.transacciones : t.misRecibos}
                           <KeyboardHint keys="K" />
                         </h3>
                         <p className="text-xs text-muted-foreground">
-                          {isAdmin ? "Gestion de dispersiones" : "Historial de nomina"}
+                          {isAdmin ? t.gestionDispersiones : t.historialNomina}
                         </p>
                       </div>
                     </div>
@@ -511,7 +519,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       }`}
                     >
                       <Send className={`w-4 h-4 ${isDispersing ? "animate-bounce" : ""}`} />
-                      {isDispersing ? "Enviando a Stellar..." : (escrowReady ? "Dispersar Fondos" : "Esperando Escrow...")}
+                      {isDispersing ? t.enviandoStellar : (escrowReady ? t.dispersarFondos : t.esperandoEscrow)}
                       {escrowReady && !isDispersing && <Zap className="w-3 h-3" />}
                     </button>
                   )}
@@ -521,7 +529,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       className="w-full mt-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-2 border border-primary/20"
                     >
                       <FileText className="w-4 h-4" />
-                      Simular mi Recibo de Nómina
+                      {t.simularRecibo}
                     </button>
                   )}
                 </div>
@@ -542,10 +550,10 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground flex items-center">
-                          Capital Humano
+                          {t.capitalHumano}
                           <KeyboardHint keys="D" />
                         </h3>
-                        <p className="text-xs text-muted-foreground">Gestion de empleados</p>
+                        <p className="text-xs text-muted-foreground">{t.gestionEmpleados}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -553,10 +561,10 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
 
                   <div className="flex items-center gap-2 mb-4">
                     <button className="px-3 py-1 rounded-lg bg-green-500/20 text-green-500 text-xs font-medium">
-                      Activos ({employeeList.filter(e => e.status === "active").length})
+                      {t.activos} ({employeeList.filter(e => e.status === "active").length})
                     </button>
                     <button className="px-3 py-1 rounded-lg bg-secondary text-muted-foreground text-xs font-medium">
-                      Inactivos ({employeeList.filter(e => e.status === "inactive").length})
+                      {t.inactivos} ({employeeList.filter(e => e.status === "inactive").length})
                     </button>
                   </div>
 
@@ -583,7 +591,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
 
                   <button onClick={() => notifyWIP("Filtros Avanzados")} className="w-full mt-4 py-2 rounded-lg bg-accent/20 text-accent text-sm font-medium hover:bg-accent/30 transition-colors flex items-center justify-center gap-2">
                     <Filter className="w-4 h-4" />
-                    Filtrar por Pais/Depto
+                    {t.filtrarPais}
                   </button>
                 </div>
               ) : (
@@ -598,9 +606,9 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground flex items-center">
-                          Mis Solicitudes
+                          {t.misSolicitudes}
                         </h3>
-                        <p className="text-xs text-muted-foreground">Vacaciones y permisos</p>
+                        <p className="text-xs text-muted-foreground">{t.vacacionesPermisos}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -619,7 +627,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
 
                   <button onClick={() => notifyWIP("Nueva Solicitud de Ausencia")} className="w-full mt-4 py-2 rounded-lg bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors flex items-center justify-center gap-2 border border-accent/20">
                     <Calendar className="w-4 h-4" />
-                    Solicitar Vacaciones
+                    {t.solicitarVacaciones}
                   </button>
                 </div>
               )}              {/* Quadrant 3: Ahorro y Tokenizacion */}
@@ -646,11 +654,11 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       </motion.div>
                       <div>
                         <h3 className="font-semibold text-foreground flex items-center">
-                          {isAdmin ? "Sistema de Tokenizacion" : "Crecimiento y Ahorros"}
+                          {isAdmin ? t.tokenizacion : t.crecimiento}
                           <KeyboardHint keys="S" />
                         </h3>
                         <p className="text-xs text-muted-foreground transition-colors group-hover:text-primary/70">
-                          {isAdmin ? "Activos y reservas" : "Tu fondo de ahorro generando APY"}
+                          {isAdmin ? t.activosReservas : t.fondoAhorro}
                         </p>
                       </div>
                     </div>
@@ -661,7 +669,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
 
                   <div className="grid grid-cols-2 gap-4 mb-5 relative z-10">
                     <motion.div whileHover={{ scale: 1.03 }} className="p-4 rounded-xl bg-secondary/40 border border-border/50 hover:border-primary/30 transition-colors">
-                      <p className="text-xs text-muted-foreground mb-1">Fondos {isAdmin ? "Tokenizados" : "Ahorrados"}</p>
+                      <p className="text-xs text-muted-foreground mb-1">{isAdmin ? t.fondosTokenizados : t.fondosAhorrados}</p>
                       <p className="text-xl font-bold text-foreground">{isAdmin ? "$2.5M" : "$12,450.00"}</p>
                       <div className="flex items-center gap-1 mt-1 text-xs text-primary font-medium">
                         <TrendingUp className="w-3 h-3" />
@@ -669,9 +677,9 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       </div>
                     </motion.div>
                     <motion.div whileHover={{ scale: 1.03 }} className="p-4 rounded-xl bg-secondary/40 border border-border/50 hover:border-primary/30 transition-colors">
-                      <p className="text-xs text-muted-foreground mb-1">En Reserva Fija</p>
+                      <p className="text-xs text-muted-foreground mb-1">{t.enReservaFija}</p>
                       <p className="text-xl font-bold text-foreground">{isAdmin ? "$1.75M" : "$5,000.00"}</p>
-                      <p className="text-xs text-muted-foreground mt-1">Saldos listos para retiro</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t.saldosRetiro}</p>
                     </motion.div>
                   </div>
 
@@ -704,8 +712,8 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                         <Settings className="w-5 h-5 text-green-500" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">Automatizacion</h3>
-                        <p className="text-xs text-muted-foreground">Flujos de nomina</p>
+                        <h3 className="font-semibold text-foreground">{t.automatizacion}</h3>
+                        <p className="text-xs text-muted-foreground">{t.flujosNomina}</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
@@ -735,7 +743,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                   {isAdmin && (
                     <button onClick={() => notifyWIP("Configurador de Nuevos Flujos")} className="w-full mt-4 py-2 rounded-lg bg-green-500/20 text-green-500 text-sm font-medium hover:bg-green-500/30 transition-colors flex items-center justify-center gap-2">
                       <Settings className="w-4 h-4" />
-                      Configurar Nuevo Flujo
+                      {t.configurarFlujo}
                     </button>
                   )}
                 </div>

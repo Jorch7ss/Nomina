@@ -30,6 +30,7 @@ export const metadata: Metadata = {
 }
 
 import { ThemeProvider } from "@/components/theme-provider"
+import { LanguageProvider } from "@/components/language-provider"
 import { Toaster } from "sonner"
 
 export default function RootLayout({
@@ -46,7 +47,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
           <Toaster richColors position="bottom-right" theme="system" />
           <Analytics />
         </ThemeProvider>
