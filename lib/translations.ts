@@ -1,11 +1,11 @@
 export const translations = {
   es: {
     // Header
-    appName: "Alebrije Flow",
-    appSubtitle: "Sistema de Nomina",
+    appName: "Nomillar",
+    appSubtitle: "Nómina y dispersión",
     rolAdmin: "Administrador",
     rolEmployee: "Empleado",
-    feedLabel: "Feed",
+    feedLabel: "Actividad",
     salir: "Salir",
 
     // KPI Cards
@@ -82,6 +82,7 @@ export const translations = {
     navAbout: "Nosotros",
     navSignIn: "Iniciar sesion",
     navCTA: "Solicitar acceso",
+    navWIP: "Sección en construcción — disponible pronto.",
 
     // Landing - Hero
     heroBadge: "Tu n\u00f3mina, a la velocidad de la luz",
@@ -123,14 +124,30 @@ export const translations = {
     footerCert: "SOC 2 Type II Certificado",
     footerRights: "2026 Stellar BAF. Todos los derechos reservados.",
     scroll: "Desplazar",
+    nominaPanelTitle: "Nómina",
+    nominaPanelDesc: "Carga de periodo y dispersión",
+    btnCargarCsv: "Cargar CSV de nómina",
+    btnVerHistorialNomina: "Historial y comparativa",
+    stellarScanTitle: "Transacciones (Stellar)",
+    stellarScanDesc: "Trazabilidad tipo explorer",
+    btnExplorador: "Abrir Stellar Expert (testnet)",
+    reportesPanelTitle: "Reportes y cumplimiento",
+    reportesPanelDesc: "Buzón y evidencias",
+    buzonQuejas: "Buzón de quejas",
+    btnAdjuntarEvidencia: "Adjuntar PDF / Word / CSV",
+    teamMembersBtn: "Miembros del equipo",
+    capitalAddRemove: "Agregar o quitar miembros",
+    planFootnote:
+      "Precios orientativos en revisión. Referencia: un plan medio (~US$199/mes) puede compensarse si evitas el costo de al menos un salario mínimo en trabajo manual de nómina.",
+    dashPriorityHint: "Prioridad operativa (admin)",
   },
   en: {
     // Header
-    appName: "Alebrije Flow",
-    appSubtitle: "Payroll System",
+    appName: "Nomillar",
+    appSubtitle: "Payroll & disbursement",
     rolAdmin: "Administrator",
     rolEmployee: "Employee",
-    feedLabel: "Feed",
+    feedLabel: "Activity",
     salir: "Log Out",
 
     // KPI Cards
@@ -207,6 +224,7 @@ export const translations = {
     navAbout: "About",
     navSignIn: "Sign in",
     navCTA: "Request access",
+    navWIP: "Section under construction — coming soon.",
 
     // Landing - Hero
     heroBadge: "Your payroll, at the speed of light",
@@ -248,6 +266,22 @@ export const translations = {
     footerCert: "SOC 2 Type II Certified",
     footerRights: "2026 Stellar BAF. All rights reserved.",
     scroll: "Scroll",
+    nominaPanelTitle: "Payroll",
+    nominaPanelDesc: "Period file & disbursement",
+    btnCargarCsv: "Upload payroll CSV",
+    btnVerHistorialNomina: "History & comparison",
+    stellarScanTitle: "Transactions (Stellar)",
+    stellarScanDesc: "Explorer-style traceability",
+    btnExplorador: "Open Stellar Expert (testnet)",
+    reportesPanelTitle: "Reports & compliance",
+    reportesPanelDesc: "Inbox & evidence",
+    buzonQuejas: "Complaints inbox",
+    btnAdjuntarEvidencia: "Attach PDF / Word / CSV",
+    teamMembersBtn: "Team members",
+    capitalAddRemove: "Add or remove members",
+    planFootnote:
+      "Indicative pricing under review. A mid tier (~US$199/mo) can pay for itself if it replaces roughly one minimum-wage worth of manual payroll work.",
+    dashPriorityHint: "Operational priority (admin)",
   },
 } as const
 

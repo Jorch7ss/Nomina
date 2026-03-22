@@ -1,6 +1,6 @@
 "use client"
 
-import { Terminal, X } from "lucide-react"
+import { Activity, X } from "lucide-react"
 import type { ContractEvent } from "@/types/dashboard"
 
 interface FeedSidebarProps {
@@ -16,8 +16,8 @@ export function FeedSidebar({ showFeed, setShowFeed, contractEvents }: FeedSideb
     }`}>
       <div className="p-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Terminal className="w-4 h-4 text-primary" />
-          <span className="font-medium text-foreground text-sm">Eventos del Contrato</span>
+          <Activity className="w-4 h-4 text-primary shrink-0" />
+          <span className="font-medium text-foreground text-sm">Actividad reciente</span>
         </div>
         <button 
           onClick={() => setShowFeed(false)}
@@ -26,14 +26,21 @@ export function FeedSidebar({ showFeed, setShowFeed, contractEvents }: FeedSideb
           <X className="w-4 h-4 text-muted-foreground" />
         </button>
       </div>
-      <div className="p-4 overflow-y-auto h-[calc(100%-60px)] terminal-feed">
+      <div className="p-4 overflow-y-auto h-[calc(100%-60px)] text-sm">
         {contractEvents.map((event) => (
           <div key={event.id} className="mb-3 pb-3 border-b border-border/50">
-            <span className="timestamp">[{event.timestamp}]</span>
-            <br />
-            <span className={event.status === "ok" ? "success" : event.status === "warning" ? "warning" : "error"}>
+            <span className="text-muted-foreground font-mono text-[11px]">[{event.timestamp}]</span>
+            <p
+              className={
+                event.status === "ok"
+                  ? "text-foreground mt-1"
+                  : event.status === "warning"
+                    ? "text-amber-600 dark:text-amber-400 mt-1"
+                    : "text-destructive mt-1"
+              }
+            >
               {event.message}
-            </span>
+            </p>
           </div>
         ))}
       </div>

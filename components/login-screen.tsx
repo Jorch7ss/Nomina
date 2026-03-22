@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Building2, Users, Shield, UserCircle, ArrowRight, Sparkles, Zap } from "lucide-react"
+import { Building2, Users, Shield, UserCircle, ArrowRight, Zap } from "lucide-react"
 
 type LoginAction = "create" | "join" | null
 type UserRole = "admin" | "basic" | null
@@ -143,7 +143,11 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                 animation: logoHovered ? "spin 3s linear infinite" : "none",
               }}
             />
-            <Sparkles className={`w-12 h-12 transition-all duration-300 ${logoHovered ? "text-white" : "text-primary"}`} />
+            <img
+              src="/logo.png"
+              alt="Nomillar"
+              className="h-14 w-auto object-contain drop-shadow-lg"
+            />
           </div>
           
           <h1 
@@ -156,11 +160,14 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
               animation: "gradient-shift 8s ease infinite",
             }}
           >
-            Alebrije Flow
+            Nomillar
           </h1>
           <p className="text-muted-foreground text-lg flex items-center justify-center gap-2">
             <Zap className="w-4 h-4 text-primary" />
-            Sistema Operativo de Nomina
+            Acceso empresa y empleado
+          </p>
+          <p className="text-muted-foreground text-sm text-center mt-3 max-w-sm mx-auto leading-relaxed">
+            Próximo paso: vincular la wallet institucional de la empresa en este flujo (Passkeys / Stellar). Mientras tanto, usa las opciones de abajo para el demo.
           </p>
         </div>
 

@@ -12,7 +12,7 @@ export function StellarLogo({ variant = "full", className = "" }: StellarLogoPro
         <img 
           src="/logo.png" 
           alt="Nomillar Icon" 
-          className="h-10 w-auto object-contain dark:drop-shadow-[0_0_12px_rgba(45,212,191,0.5)] drop-shadow-md transition-all"
+          className="h-12 min-h-[48px] w-auto max-w-[200px] object-contain dark:drop-shadow-[0_0_12px_rgba(45,212,191,0.5)] drop-shadow-md transition-all"
         />
       </div>
     )
@@ -23,7 +23,7 @@ export function StellarLogo({ variant = "full", className = "" }: StellarLogoPro
       <img 
         src="/logo.png" 
         alt="Nomillar by Stellar" 
-        className="h-8 w-auto object-contain dark:drop-shadow-[0_0_12px_rgba(45,212,191,0.4)] drop-shadow-sm transition-all"
+        className="h-11 min-h-[44px] w-auto max-w-[220px] object-contain dark:drop-shadow-[0_0_12px_rgba(45,212,191,0.4)] drop-shadow-sm transition-all"
       />
       <div className="flex flex-col">
         <span className="text-lg font-bold tracking-tight text-foreground">

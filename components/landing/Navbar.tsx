@@ -34,14 +34,17 @@ export function Navbar({ scrolled, onGetStarted }: NavbarProps) {
       }`}
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <StellarLogo />
+        <StellarLogo className="[&_img]:h-10 min-w-0" />
         
         <div className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
             <a 
               key={item.id}
               href={`#${item.id}`} 
-              onClick={(e) => { e.preventDefault(); notifyWIP(`Sección: ${item.label}`) }}
+              onClick={(e) => {
+                e.preventDefault()
+                notifyWIP(t.navWIP)
+              }}
               className="relative text-sm text-muted-foreground transition-colors hover:text-foreground group"
             >
               {item.label}

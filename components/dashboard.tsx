@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { motion } from "framer-motion"
 import { 
   Wallet, 
@@ -11,7 +11,6 @@ import {
   Send,
   FileText,
   Building2,
-  Filter,
   Coins,
   LineChart,
   Settings,
@@ -21,11 +20,10 @@ import {
   AlertCircle,
   ChevronRight,
   X,
-  Sparkles,
   LogOut,
   Shield,
   UserCircle,
-  Terminal,
+  Activity,
   Upload,
   BarChart3,
   UserMinus,
@@ -41,6 +39,8 @@ import { FeedSidebar } from "@/components/dashboard/FeedSidebar"
 import { useLanguage } from "@/components/language-provider"
 import { translations } from "@/lib/translations"
 import { LanguageToggle } from "@/components/language-toggle"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { StellarLogo } from "@/components/stellar-logo"
 
 export function Dashboard({ role, onLogout }: DashboardProps) {
   const { notifyWIP } = useUIFeedback()
@@ -56,6 +56,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
   const [employeeList, setEmployeeList] = useState<Employee[]>([])
   const [contractEvents, setContractEvents] = useState<ContractEvent[]>([])
   const [isDispersing, setIsDispersing] = useState(false)
+  const csvInputRef = useRef<HTMLInputElement>(null)
 
   const handleDisperseFunds = async () => {
     if (!escrowReady || isDispersing) return
@@ -193,35 +194,6 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
     return () => clearInterval(interval)
   }, [isConnected])
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return
-      
-      switch(e.key.toLowerCase()) {
-        case 'k':
-          setSelectedQuadrant(selectedQuadrant === 1 ? null : 1)
-          break
-        case 'd':
-          if (isAdmin) setSelectedQuadrant(selectedQuadrant === 2 ? null : 2)
-          break
-        case 's':
-          setSelectedQuadrant(selectedQuadrant === 3 ? null : 3)
-          break
-        case 'f':
-          setShowFeed(prev => !prev)
-          break
-        case 'escape':
-          setSelectedQuadrant(null)
-          setShowFeed(false)
-          break
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [selectedQuadrant, isAdmin])
-
   const handleRemoveEmployee = useCallback((empId: string) => {
     setDissolvingEmployee(empId)
     
@@ -277,10 +249,6 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
     </div>
   )
 
-  const KeyboardHint = ({ keys }: { keys: string }) => (
-    <span className="kbd-tooltip ml-2">{keys}</span>
-  )
-
   // Payroll comparison data for chart
   const payrollComparison = [
     { label: "Ene", current: 1250000, previous: 1180000 },
@@ -297,22 +265,20 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
       <header className="border-b border-border bg-card/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl glass-card flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">{t.appName}</h1>
-                <p className="text-xs text-muted-foreground">{t.appSubtitle}</p>
+            <div className="flex items-center gap-3 min-w-0">
+              <StellarLogo variant="icon" className="shrink-0" />
+              <div className="min-w-0">
+                <h1 className="text-xl font-bold text-foreground truncate">{t.appName}</h1>
+                <p className="text-xs text-muted-foreground truncate">{t.appSubtitle}</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
-              {/* Language Toggle */}
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-end">
               <LanguageToggle />
+              <ThemeToggle />
 
-              {/* Feed Toggle */}
               <button
+                type="button"
                 onClick={() => setShowFeed(prev => !prev)}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
                   showFeed 
@@ -320,9 +286,8 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                     : "bg-secondary/50 text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Terminal className="w-4 h-4" />
+                <Activity className="w-4 h-4 shrink-0" />
                 <span className="text-sm hidden sm:inline">{t.feedLabel}</span>
-                <KeyboardHint keys="F" />
               </button>
 
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
@@ -422,10 +387,6 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       </div>
                       <span className="text-xs text-muted-foreground">{t.diasRestantes}</span>
                     </div>
-                    <div className="flex items-center gap-1 mt-2 text-xs text-accent">
-                      <Globe className="w-3 h-3" />
-                      <span>4 paises, 1,247 empleados</span>
-                    </div>
                   </>
                 )}
               </div>
@@ -446,19 +407,25 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                         <Users className="w-5 h-5 text-neon-violet" />
                       </div>
                     </div>
-                    <div className="mt-4 grid grid-cols-4 gap-2">
-                      {[
-                        { flag: "MX", count: 890 },
-                        { flag: "US", count: 215 },
-                        { flag: "CO", count: 98 },
-                        { flag: "ES", count: 44 },
-                      ].map((c) => (
-                        <div key={c.flag} className="text-center">
-                          <p className="text-xs font-medium text-foreground">{c.flag}</p>
-                          <p className="text-xs text-muted-foreground">{c.count}</p>
-                        </div>
-                      ))}
-                    </div>
+                    {isAdmin ? (
+                      <div className="mt-4 grid grid-cols-4 gap-2">
+                        {[
+                          { flag: "MX", count: 890 },
+                          { flag: "US", count: 215 },
+                          { flag: "CO", count: 98 },
+                          { flag: "ES", count: 44 },
+                        ].map((c) => (
+                          <div key={c.flag} className="text-center">
+                            <p className="text-xs font-medium text-foreground">{c.flag}</p>
+                            <p className="text-xs text-muted-foreground">{c.count}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="mt-4 text-xs text-muted-foreground">
+                        País y detalle de plantilla: usa el panel de Capital humano (solo admin) o consulta con RR.HH.
+                      </p>
+                    )}
                     <div className="flex items-center gap-1 mt-2 text-xs text-green-500">
                       <ArrowUpRight className="w-3 h-3" />
                       <span>{t.esteMes}</span>
@@ -469,75 +436,133 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
             </div>
           </div>
 
-          {/* Dashboard Grid 2x2 */}
+          {/* Dashboard: admin prioridad Nómina → RH → Stellar → Reportes */}
           <div className="max-w-7xl mx-auto px-4 pb-8">
+            {isAdmin && (
+              <p className="text-xs text-muted-foreground mb-3">{t.dashPriorityHint}</p>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Quadrant 1: Transacciones */}
               {isLoading ? (
                 <SkeletonCard variant="cyan" />
               ) : (
-                <div 
-                  onClick={() => setSelectedQuadrant(1)}
-                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden ${
-                    isAdmin ? "card-admin" : "card-employee"
+                <div
+                  onClick={isAdmin ? undefined : () => setSelectedQuadrant(1)}
+                  onKeyDown={isAdmin ? undefined : (e) => e.key === "Enter" && setSelectedQuadrant(1)}
+                  role={isAdmin ? undefined : "button"}
+                  tabIndex={isAdmin ? undefined : 0}
+                  className={`glass-card rounded-xl p-6 alebrije-pattern relative overflow-hidden ${
+                    isAdmin
+                      ? "card-admin"
+                      : "card-employee cursor-pointer hover:scale-[1.02] transition-transform"
                   } ${!isLoading && isConnected ? "light-sweep" : ""}`}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                        <Send className="w-5 h-5 text-primary" />
+                  {isAdmin ? (
+                    <>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                          <FileText className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-foreground">{t.nominaPanelTitle}</h3>
+                          <p className="text-xs text-muted-foreground">{t.nominaPanelDesc}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground flex items-center">
-                          {isAdmin ? t.transacciones : t.misRecibos}
-                          <KeyboardHint keys="K" />
-                        </h3>
-                        <p className="text-xs text-muted-foreground">
-                          {isAdmin ? t.gestionDispersiones : t.historialNomina}
-                        </p>
+                      <input
+                        ref={csvInputRef}
+                        type="file"
+                        accept=".csv,.txt"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0]
+                          if (f) {
+                            toast.success(`Archivo: ${f.name}`, {
+                              description: "Validación contra dispersor en siguiente iteración.",
+                            })
+                          }
+                          e.target.value = ""
+                        }}
+                      />
+                      <div className="flex flex-col gap-2">
+                        <button
+                          type="button"
+                          onClick={() => csvInputRef.current?.click()}
+                          className="w-full py-2.5 rounded-lg bg-secondary text-foreground text-sm font-medium hover:bg-secondary/80 flex items-center justify-center gap-2 border border-border"
+                        >
+                          <Upload className="w-4 h-4" />
+                          {t.btnCargarCsv}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDisperseFunds()}
+                          disabled={isDispersing || !escrowReady}
+                          className={`w-full py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 ${
+                            escrowReady && !isDispersing
+                              ? "btn-dispersion-ready text-foreground"
+                              : "btn-dispersion-pending opacity-70"
+                          }`}
+                        >
+                          <Send className="w-4 h-4" />
+                          {isDispersing
+                            ? t.enviandoStellar
+                            : escrowReady
+                              ? "Ejecutar dispersión masiva"
+                              : t.esperandoEscrow}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedQuadrant(1)}
+                          className="w-full py-2 rounded-lg border border-primary/30 text-primary text-sm font-medium hover:bg-primary/10"
+                        >
+                          {t.btnVerHistorialNomina}
+                        </button>
                       </div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {(isAdmin ? transactions.slice(0, 3) : transactions.filter(t => t.type.includes("Recibo") || t.type.includes("Aguinaldo")).slice(0, 3)).map((tx) => (
-                      <div key={tx.id} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <StatusIcon status={tx.status} />
+                          <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                            <Send className="w-5 h-5 text-primary" />
+                          </div>
                           <div>
-                            <p className="text-sm font-medium text-foreground">{tx.type}</p>
-                            <p className="text-xs text-muted-foreground">{tx.date}</p>
+                            <h3 className="font-semibold text-foreground">{t.misRecibos}</h3>
+                            <p className="text-xs text-muted-foreground">{t.historialNomina}</p>
                           </div>
                         </div>
-                        <p className="text-sm font-medium text-foreground">{tx.amount}</p>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
                       </div>
-                    ))}
-                  </div>
-
-                  {isAdmin && (
-                    <button 
-                      onClick={handleDisperseFunds}
-                      disabled={isDispersing || !escrowReady}
-                      className={`w-full mt-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all ${
-                        escrowReady && !isDispersing
-                          ? "btn-dispersion-ready text-foreground" 
-                          : "btn-dispersion-pending text-muted-foreground opacity-70"
-                      }`}
-                    >
-                      <Send className={`w-4 h-4 ${isDispersing ? "animate-bounce" : ""}`} />
-                      {isDispersing ? t.enviandoStellar : (escrowReady ? t.dispersarFondos : t.esperandoEscrow)}
-                      {escrowReady && !isDispersing && <Zap className="w-3 h-3" />}
-                    </button>
-                  )}
-                  {!isAdmin && (
-                    <button 
-                      onClick={() => setShowReceipt(true)}
-                      className="w-full mt-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-2 border border-primary/20"
-                    >
-                      <FileText className="w-4 h-4" />
-                      {t.simularRecibo}
-                    </button>
+                      <div className="space-y-3">
+                        {transactions
+                          .filter((tx) => tx.type.includes("Recibo") || tx.type.includes("Aguinaldo"))
+                          .slice(0, 3)
+                          .map((tx) => (
+                            <div
+                              key={tx.id}
+                              className="flex items-center justify-between p-3 rounded-lg bg-secondary/30"
+                            >
+                              <div className="flex items-center gap-3">
+                                <StatusIcon status={tx.status} />
+                                <div>
+                                  <p className="text-sm font-medium text-foreground">{tx.type}</p>
+                                  <p className="text-xs text-muted-foreground">{tx.date}</p>
+                                </div>
+                              </div>
+                              <p className="text-sm font-medium text-foreground">{tx.amount}</p>
+                            </div>
+                          ))}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setShowReceipt(true)
+                        }}
+                        className="w-full mt-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-2 border border-primary/20"
+                      >
+                        <FileText className="w-4 h-4" />
+                        {t.simularRecibo}
+                      </button>
+                    </>
                   )}
                 </div>
               )}
@@ -556,10 +581,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                         <Building2 className="w-5 h-5 text-accent" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground flex items-center">
-                          {t.capitalHumano}
-                          <KeyboardHint keys="D" />
-                        </h3>
+                        <h3 className="font-semibold text-foreground">{t.capitalHumano}</h3>
                         <p className="text-xs text-muted-foreground">{t.gestionEmpleados}</p>
                       </div>
                     </div>
@@ -596,10 +618,30 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                     ))}
                   </div>
 
-                  <button onClick={() => notifyWIP("Filtros Avanzados")} className="w-full mt-4 py-2 rounded-lg bg-accent/20 text-accent text-sm font-medium hover:bg-accent/30 transition-colors flex items-center justify-center gap-2">
-                    <Filter className="w-4 h-4" />
-                    {t.filtrarPais}
-                  </button>
+                  <div className="flex flex-col gap-2 mt-4">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSelectedQuadrant(2)
+                      }}
+                      className="w-full py-2 rounded-lg bg-accent/20 text-accent text-sm font-medium hover:bg-accent/30 flex items-center justify-center gap-2"
+                    >
+                      <Users className="w-4 h-4" />
+                      {t.teamMembersBtn}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        notifyWIP("Alta o baja de plantilla (wallet + estado)")
+                      }}
+                      className="w-full py-2 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-secondary/80 flex items-center justify-center gap-2"
+                    >
+                      <UserMinus className="w-4 h-4" />
+                      {t.capitalAddRemove}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div 
@@ -637,81 +679,146 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                     {t.solicitarVacaciones}
                   </button>
                 </div>
-              )}              {/* Quadrant 3: Ahorro y Tokenizacion */}
+              )}{/* Quadrant 3: Stellar (admin) / resumen empleado */}
               {isLoading ? (
                 <SkeletonCard variant="cyan" />
-              ) : (
-                <motion.div 
-                  layoutId="quadrant-3"
-                  onClick={() => setSelectedQuadrant(3)}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer relative overflow-hidden group border border-border/50 hover:border-primary/40 ${
-                    isAdmin ? "card-admin" : "card-employee"
-                  } ${!isLoading && isConnected ? "light-sweep" : ""}`}
+              ) : isAdmin ? (
+                <div
+                  className={`glass-card rounded-xl p-6 alebrije-pattern card-admin relative overflow-hidden border border-border/50 ${
+                    !isLoading && isConnected ? "light-sweep" : ""
+                  }`}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  <div className="flex items-center justify-between mb-4 relative z-10">
+                  <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <motion.div 
-                        whileHover={{ rotate: 15 }}
-                        className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/20 shadow-[0_0_15px_rgba(45,212,191,0.2)]"
-                      >
-                        <Coins className="w-5 h-5 text-primary" />
-                      </motion.div>
+                      <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                        <BarChart3 className="w-5 h-5 text-primary" />
+                      </div>
                       <div>
-                        <h3 className="font-semibold text-foreground flex items-center">
-                          {isAdmin ? t.tokenizacion : t.crecimiento}
-                          <KeyboardHint keys="S" />
-                        </h3>
-                        <p className="text-xs text-muted-foreground transition-colors group-hover:text-primary/70">
-                          {isAdmin ? t.activosReservas : t.fondoAhorro}
-                        </p>
+                        <h3 className="font-semibold text-foreground">{t.stellarScanTitle}</h3>
+                        <p className="text-xs text-muted-foreground">{t.stellarScanDesc}</p>
                       </div>
                     </div>
-                    <motion.div whileHover={{ x: 3 }}>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </motion.div>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4 mb-5 relative z-10">
-                    <motion.div whileHover={{ scale: 1.03 }} className="p-4 rounded-xl bg-secondary/40 border border-border/50 hover:border-primary/30 transition-colors">
-                      <p className="text-xs text-muted-foreground mb-1">{isAdmin ? t.fondosTokenizados : t.fondosAhorrados}</p>
-                      <p className="text-xl font-bold text-foreground">{isAdmin ? "$2.5M" : "$12,450.00"}</p>
-                      <div className="flex items-center gap-1 mt-1 text-xs text-primary font-medium">
-                        <TrendingUp className="w-3 h-3" />
-                        <span>+3.2% mensual</span>
+                  <div className="overflow-x-auto rounded-lg border border-border max-h-48">
+                    <table className="w-full text-xs text-left">
+                      <thead>
+                        <tr className="border-b border-border bg-secondary/50 text-muted-foreground">
+                          <th className="p-2 font-medium">Wallet origen</th>
+                          <th className="p-2 font-medium">Wallet destino</th>
+                          <th className="p-2 font-medium">Fecha</th>
+                          <th className="p-2 font-medium">Hash</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-foreground">
+                        {[
+                          { from: "GCF4…TWXH", to: "GBE…3BS", d: "2024-01-15", h: "a1b2…9f0" },
+                          { from: "GCF4…TWXH", to: "GDM…2ZZ", d: "2024-01-14", h: "c3d4…8e1" },
+                          { from: "Custodia", to: "GXY…88K", d: "2024-01-13", h: "e5f6…7d2" },
+                        ].map((row, i) => (
+                          <tr key={i} className="border-b border-border/60 hover:bg-secondary/30">
+                            <td className="p-2 font-mono">{row.from}</td>
+                            <td className="p-2 font-mono">{row.to}</td>
+                            <td className="p-2">{row.d}</td>
+                            <td className="p-2 font-mono text-primary">{row.h}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2 mt-3">
+                    <button
+                      type="button"
+                      onClick={() => notifyWIP("Exportar CSV con filtros aplicados")}
+                      className="flex-1 py-2 rounded-lg bg-secondary text-sm font-medium text-foreground border border-border hover:bg-secondary/80"
+                    >
+                      Descargar vista (demo)
+                    </button>
+                    <a
+                      href="https://stellar.expert/explorer/testnet"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 py-2 rounded-lg bg-primary/15 text-primary text-sm font-medium text-center border border-primary/30 hover:bg-primary/25"
+                    >
+                      {t.btnExplorador}
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <motion.div
+                  layoutId="quadrant-3-emp"
+                  onClick={() => setSelectedQuadrant(3)}
+                  whileHover={{ y: -2, transition: { duration: 0.2 } }}
+                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer relative overflow-hidden card-employee border border-border/50 ${
+                    !isLoading && isConnected ? "light-sweep" : ""
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+                        <Coins className="w-5 h-5 text-primary" />
                       </div>
-                    </motion.div>
-                    <motion.div whileHover={{ scale: 1.03 }} className="p-4 rounded-xl bg-secondary/40 border border-border/50 hover:border-primary/30 transition-colors">
+                      <div>
+                        <h3 className="font-semibold text-foreground">{t.crecimiento}</h3>
+                        <p className="text-xs text-muted-foreground">{t.fondoAhorro}</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 rounded-xl bg-secondary/40 border border-border/50">
+                      <p className="text-xs text-muted-foreground mb-1">{t.fondosAhorrados}</p>
+                      <p className="text-lg font-bold text-foreground">$12,450.00</p>
+                    </div>
+                    <div className="p-3 rounded-xl bg-secondary/40 border border-border/50">
                       <p className="text-xs text-muted-foreground mb-1">{t.enReservaFija}</p>
-                      <p className="text-xl font-bold text-foreground">{isAdmin ? "$1.75M" : "$5,000.00"}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{t.saldosRetiro}</p>
-                    </motion.div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 relative z-10 overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl -mr-16 -mt-16" />
-                    <div className="flex items-center gap-2 mb-2">
-                       <Zap className="w-4 h-4 text-primary animate-pulse" />
-                       <p className="text-sm font-medium text-foreground">Rendimientos Inteligentes</p>
+                      <p className="text-lg font-bold text-foreground">$5,000.00</p>
                     </div>
-                    <p className="text-xs text-muted-foreground relative z-10">
-                      Tus fondos en espera generan rendimientos automáticos del 4.8% APY anualizados, habilitados gracias a los smart-contracts descentralizados de la red.
-                    </p>
                   </div>
                 </motion.div>
               )}
 
-              {/* Quadrant 4: Automatizacion */}
               {isLoading ? (
                 <SkeletonCard variant="cyan" />
+              ) : isAdmin ? (
+                <div
+                  className={`glass-card rounded-xl p-6 alebrije-pattern card-admin relative overflow-hidden ${
+                    !isLoading && isConnected ? "light-sweep" : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                      <FileText className="w-5 h-5 text-green-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-foreground">{t.reportesPanelTitle}</h3>
+                      <p className="text-xs text-muted-foreground">{t.reportesPanelDesc}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-3">{t.buzonQuejas}</p>
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.csv"
+                    className="w-full text-xs text-muted-foreground file:mr-2 file:rounded-md file:border-0 file:bg-primary/15 file:px-3 file:py-2 file:text-primary"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f) toast.success(`Evidencia: ${f.name}`, { description: "Se integrará al backend de reportes." })
+                      e.target.value = ""
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => notifyWIP("Enviar al buzón (integración pendiente)")}
+                    className="w-full mt-3 py-2 rounded-lg bg-green-500/20 text-green-600 dark:text-green-400 text-sm font-medium"
+                  >
+                    {t.btnAdjuntarEvidencia}
+                  </button>
+                </div>
               ) : (
-                <div 
+                <div
                   onClick={() => setSelectedQuadrant(4)}
-                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden ${
-                    isAdmin ? "card-admin" : "card-employee"
-                  } ${!isLoading && isConnected ? "light-sweep" : ""}`}
+                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden card-employee ${
+                    !isLoading && isConnected ? "light-sweep" : ""
+                  }`}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -725,34 +832,24 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
                   </div>
-
                   <div className="space-y-3">
                     {[
                       { name: "Nomina Quincenal UNAM", nextRun: "15 Ene", status: "active" },
                       { name: "Dispersion Estelar Foundation", nextRun: "01 Feb", status: "active" },
-                      { name: "Bonos Trimestrales", nextRun: "01 Abr", status: "active" },
                     ].map((flow, i) => (
                       <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">
                         <div className="flex items-center gap-3">
-                          <div className={`w-2 h-2 rounded-full ${flow.status === "active" ? "bg-green-500" : "bg-muted"}`} />
+                          <div
+                            className={`w-2 h-2 rounded-full ${flow.status === "active" ? "bg-green-500" : "bg-muted"}`}
+                          />
                           <div>
                             <p className="text-sm font-medium text-foreground">{flow.name}</p>
                             <p className="text-xs text-muted-foreground">Proxima: {flow.nextRun}</p>
                           </div>
                         </div>
-                        {isAdmin && (
-                          <button onClick={() => notifyWIP("Editor de Flujos")} className="text-xs text-primary hover:underline">Editar</button>
-                        )}
                       </div>
                     ))}
                   </div>
-
-                  {isAdmin && (
-                    <button onClick={() => notifyWIP("Configurador de Nuevos Flujos")} className="w-full mt-4 py-2 rounded-lg bg-green-500/20 text-green-500 text-sm font-medium hover:bg-green-500/30 transition-colors flex items-center justify-center gap-2">
-                      <Settings className="w-4 h-4" />
-                      {t.configurarFlujo}
-                    </button>
-                  )}
                 </div>
               )}
             </div>

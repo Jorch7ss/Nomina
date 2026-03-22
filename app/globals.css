@@ -48,6 +48,9 @@
   --stellar-dark: #000000;
   --glass-bg: #ffffffcc;
   --glass-border: #e1e1e166;
+  --neon-cyan: #00c9a7;
+  --neon-fuchsia: #e879f9;
+  --neon-violet: #a78bfa;
 }
 
 .dark {
@@ -83,6 +86,12 @@
   --sidebar-accent-foreground: oklch(0.96 0.005 240);
   --sidebar-border: oklch(0.24 0.015 240);
   --sidebar-ring: oklch(0.72 0.17 175);
+  /* Glass / acentos en modo oscuro (antes heredaban blanco de :root) */
+  --glass-bg: oklch(0.17 0.02 240 / 0.82);
+  --glass-border: oklch(0.30 0.02 240 / 0.55);
+  --neon-cyan: oklch(0.72 0.17 175);
+  --neon-fuchsia: oklch(0.65 0.22 330);
+  --neon-violet: oklch(0.62 0.22 285);
 }
 
 @theme inline {

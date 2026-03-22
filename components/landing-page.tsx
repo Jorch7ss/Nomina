@@ -127,10 +127,15 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
     },
     {
       name: "Business",
-      price: "$4.99",
-      period: "/empleado/mes",
-      description: "Para empresas en crecimiento",
-      features: ["Empleados ilimitados", "5 paises", "Soporte prioritario", "API completa", "Integraciones ERP"],
+      price: "~US$199",
+      period: "/mes",
+      description: "Referencia: menos que un salario mínimo en trabajo manual de nómina",
+      features: [
+        "Dispersión y trazabilidad Stellar",
+        "Multi-país (según configuración)",
+        "Soporte prioritario",
+        "API + integraciones (roadmap)",
+      ],
       cta: "Iniciar prueba",
       popular: true,
     },
@@ -266,23 +271,6 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                   <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-50" />
                   
                   <div className="relative z-10">
-                    {/* Floating +Profit badge (Soft, pill-like) */}
-                    <motion.div
-                      animate={{ y: [0, -10, 0] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute -right-6 -top-6 rounded-[2rem] border border-white/10 bg-card/80 px-6 py-4 shadow-2xl backdrop-blur-xl"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/10">
-                          <TrendingUp className="h-5 w-5 text-green-500" />
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Interés Generado</p>
-                          <p className="text-xl font-bold text-foreground">+$12,450.00</p>
-                        </div>
-                      </div>
-                    </motion.div>
-
                     {/* Floating Shield badge (Clean) */}
                     <motion.div
                       animate={{ y: [0, 15, 0] }}
@@ -653,6 +641,9 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
               </motion.div>
             ))}
           </div>
+          <p className="mt-10 text-center text-sm text-muted-foreground max-w-2xl mx-auto">
+            {t.planFootnote}
+          </p>
         </div>
       </section>
 
