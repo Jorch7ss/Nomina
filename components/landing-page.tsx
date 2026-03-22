@@ -37,7 +37,6 @@ interface LandingPageProps {
 export function LandingPage({ onGetStarted }: LandingPageProps) {
   const { notifyWIP } = useUIFeedback()
   const [scrolled, setScrolled] = useState(false)
-  const [showReceipt, setShowReceipt] = useState(false)
   const [activeMetric, setActiveMetric] = useState(0)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const heroRef = useRef<HTMLElement>(null)
@@ -488,13 +487,6 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                   Explorar el dashboard
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </button>
-                <button
-                  onClick={() => setShowReceipt(true)}
-                  className="group flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-5 py-2.5 text-sm font-medium text-primary shadow-sm shadow-primary/10 transition-colors hover:bg-primary/20 hover:shadow-primary/20"
-                >
-                  <FileCheck className="h-4 w-4" />
-                  Simular Recibo de Nómina
-                </button>
               </div>
             </motion.div>
 
@@ -765,68 +757,6 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
           </div>
         </div>
       </footer>
-
-      {/* Receipt Simulation Overlay */}
-      {showReceipt && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 p-4 backdrop-blur-md transition-all" onClick={() => setShowReceipt(false)}>
-          <motion.div 
-            initial={{ scale: 0.95, y: 20, opacity: 0 }} 
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card shadow-2xl relative"
-          >
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
-            <div className="bg-muted/30 p-8 text-center border-b border-border/50">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/20">
-                <FileCheck className="h-8 w-8" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground">Recibo de Nómina</h3>
-              <p className="text-sm text-muted-foreground mt-1">Periodo: Mar 01 - Mar 15, 2026</p>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="flex justify-between border-b border-border/50 pb-3">
-                <span className="text-muted-foreground text-sm">Empresa</span>
-                <span className="font-medium text-sm">Stellar BAF Inc.</span>
-              </div>
-              <div className="flex justify-between border-b border-border/50 pb-3">
-                <span className="text-muted-foreground text-sm">Empleado</span>
-                <span className="font-medium text-sm">Jorge Desarrollador</span>
-              </div>
-              <div className="flex justify-between border-b border-border/50 pb-3">
-                <span className="text-muted-foreground text-sm">Salario Base</span>
-                <span className="font-medium text-sm">$4,500.00 USDC</span>
-              </div>
-              <div className="flex justify-between border-b border-border/50 pb-3">
-                <span className="text-muted-foreground text-sm">Deducciones (Impuestos)</span>
-                <span className="font-medium text-sm text-destructive">-$350.00 USDC</span>
-              </div>
-              <div className="flex justify-between pt-3 items-center">
-                <span className="font-bold text-foreground">Total Neto a Recibir</span>
-                <span className="text-2xl font-bold text-green-500">$4,150.00 USDC</span>
-              </div>
-            </div>
-            <div className="bg-muted p-4 flex gap-3 h-16">
-              <button 
-                onClick={() => setShowReceipt(false)} 
-                className="flex-1 rounded-lg border border-border bg-background py-2 text-sm font-medium hover:bg-muted/80 transition-colors"
-              >
-                Cerrar
-              </button>
-              <button 
-                onClick={() => {
-                  alert("¡Simulación exitosa! Recibo_Nomina_Mar_2026.pdf está descargado.")
-                  setShowReceipt(false)
-                }} 
-                className="flex-1 rounded-lg bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 transition-all hover:shadow-lg shadow-sm"
-              >
-                <ArrowRight className="h-4 w-4 rotate-90" />
-                Descargar Recibo
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
     </div>
   )
 }
