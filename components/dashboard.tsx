@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { motion } from "framer-motion"
 import { 
   Wallet, 
   Calendar, 
@@ -28,8 +29,10 @@ import {
   Upload,
   BarChart3,
   UserMinus,
-  Zap
+  Zap,
+  ArrowRight
 } from "lucide-react"
+import { toast } from "sonner"
 
 import { useUIFeedback } from "@/hooks/useUIFeedback"
 import type { DashboardProps, Transaction, Employee, ContractEvent } from "@/types/dashboard"
@@ -38,6 +41,7 @@ import { FeedSidebar } from "@/components/dashboard/FeedSidebar"
 export function Dashboard({ role, onLogout }: DashboardProps) {
   const { notifyWIP } = useUIFeedback()
   const [selectedQuadrant, setSelectedQuadrant] = useState<number | null>(null)
+  const [showReceipt, setShowReceipt] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [showFeed, setShowFeed] = useState(false)
@@ -45,6 +49,67 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
   const [escrowReady, setEscrowReady] = useState(true)
   const [employeeList, setEmployeeList] = useState<Employee[]>([])
   const [contractEvents, setContractEvents] = useState<ContractEvent[]>([])
+  const [isDispersing, setIsDispersing] = useState(false)
+
+  const handleDisperseFunds = async () => {
+    if (!escrowReady || isDispersing) return
+    setIsDispersing(true)
+    const toastId = toast.loading("Iniciando dispersión en Stellar...", { description: "Preparando contratos Soroban..." })
+    
+    // URL dinámica (de Vercel o de localhost si no hay entorno)
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+    
+    // Controlador para evitar quedarse colgado si el servidor local no está corriendo
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s límite
+    
+    try {
+      // Generar CSV dinámico para la API
+      const header = "phone,employee_id,amount,date_of_birth,stellar_address\n"
+      const rows = employeeList.filter(e => e.status === "active").map((emp, index) => {
+        return `+52551234560${index},${emp.id},1.00,1990-01-01,GCF4XVNREGZD3BJE2MURDVKISSATDWP2CX6FFCWZIQFC6NKJMP26TWXH`
+      }).join("\n")
+      const csvStr = header + rows
+
+      const res = await fetch(`${apiUrl}/api/dispersar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ csv: csvStr }),
+        signal: controller.signal
+      })
+      
+      clearTimeout(timeoutId)
+      const data = await res.json()
+      
+      if (!res.ok) throw new Error(data.error || "Error interno en el servidor de dispersión")
+      
+      toast.success("Nómina Dispersada Exitosamente", {
+        id: toastId,
+        description: `Tx Hash: ${data.hash.slice(0, 8)}...${data.hash.slice(-8)}\nTotal Pagado: ${data.total} ${data.asset}`,
+        duration: 8000
+      })
+    } catch (error: any) {
+      clearTimeout(timeoutId)
+      
+      let errorMsg = "Ocurrió un error inesperado al procesar la dispersión."
+      
+      if (error.name === "AbortError") {
+        errorMsg = "Tiempo agotado. El backend tardó demasiado en responder."
+      } else if (error.message === "Failed to fetch" || error.message.includes("Load failed")) {
+        errorMsg = "El backend está apagado o inactivo.\n\n→ Si estás probando localmente, corre el comando: npm run backend"
+      } else if (error.message) {
+        errorMsg = error.message
+      }
+
+      toast.error("Error al dispersar fondos", {
+        id: toastId,
+        description: errorMsg,
+        duration: 7000
+      })
+    } finally {
+      setIsDispersing(false)
+    }
+  }
 
   const isAdmin = role === "admin"
 
@@ -437,30 +502,38 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
 
                   {isAdmin && (
                     <button 
-                      onClick={() => escrowReady ? notifyWIP("Dispersar Fondos") : null}
+                      onClick={handleDisperseFunds}
+                      disabled={isDispersing || !escrowReady}
                       className={`w-full mt-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all ${
-                        escrowReady 
+                        escrowReady && !isDispersing
                           ? "btn-dispersion-ready text-foreground" 
-                          : "btn-dispersion-pending text-muted-foreground"
+                          : "btn-dispersion-pending text-muted-foreground opacity-70"
                       }`}
                     >
-                      <Send className="w-4 h-4" />
-                      {escrowReady ? "Dispersar Fondos" : "Esperando Escrow..."}
-                      {escrowReady && <Zap className="w-3 h-3" />}
+                      <Send className={`w-4 h-4 ${isDispersing ? "animate-bounce" : ""}`} />
+                      {isDispersing ? "Enviando a Stellar..." : (escrowReady ? "Dispersar Fondos" : "Esperando Escrow...")}
+                      {escrowReady && !isDispersing && <Zap className="w-3 h-3" />}
+                    </button>
+                  )}
+                  {!isAdmin && (
+                    <button 
+                      onClick={() => setShowReceipt(true)}
+                      className="w-full mt-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition-colors flex items-center justify-center gap-2 border border-primary/20"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Simular mi Recibo de Nómina
                     </button>
                   )}
                 </div>
               )}
 
-              {/* Quadrant 2: Capital Humano */}
+              {/* Quadrant 2: Capital Humano / Solicitudes */}
               {isLoading ? (
                 <SkeletonCard variant="fuchsia" />
-              ) : (
+              ) : isAdmin ? (
                 <div 
                   onClick={() => setSelectedQuadrant(2)}
-                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden ${
-                    isAdmin ? "card-admin" : "card-employee"
-                  } ${!isLoading && isConnected ? "light-sweep" : ""}`}
+                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden card-admin ${!isLoading && isConnected ? "light-sweep" : ""}`}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -470,7 +543,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                       <div>
                         <h3 className="font-semibold text-foreground flex items-center">
                           Capital Humano
-                          {isAdmin && <KeyboardHint keys="D" />}
+                          <KeyboardHint keys="D" />
                         </h3>
                         <p className="text-xs text-muted-foreground">Gestion de empleados</p>
                       </div>
@@ -508,69 +581,111 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                     ))}
                   </div>
 
-                  {isAdmin && (
-                    <button onClick={() => notifyWIP("Filtros Avanzados")} className="w-full mt-4 py-2 rounded-lg bg-accent/20 text-accent text-sm font-medium hover:bg-accent/30 transition-colors flex items-center justify-center gap-2">
-                      <Filter className="w-4 h-4" />
-                      Filtrar por Pais/Depto
-                    </button>
-                  )}
+                  <button onClick={() => notifyWIP("Filtros Avanzados")} className="w-full mt-4 py-2 rounded-lg bg-accent/20 text-accent text-sm font-medium hover:bg-accent/30 transition-colors flex items-center justify-center gap-2">
+                    <Filter className="w-4 h-4" />
+                    Filtrar por Pais/Depto
+                  </button>
                 </div>
-              )}
-
-              {/* Quadrant 3: Ahorro y Tokenizacion */}
-              {isLoading ? (
-                <SkeletonCard variant="violet" />
               ) : (
                 <div 
-                  onClick={() => setSelectedQuadrant(3)}
-                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden ${
-                    isAdmin ? "card-admin" : "card-employee"
-                  } ${!isLoading && isConnected ? "light-sweep" : ""}`}
+                  onClick={() => setSelectedQuadrant(2)}
+                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer hover:scale-[1.02] transition-transform relative overflow-hidden card-employee ${!isLoading && isConnected ? "light-sweep" : ""}`}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-neon-violet/20 flex items-center justify-center">
-                        <Coins className="w-5 h-5 text-neon-violet" />
+                      <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-accent" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground flex items-center">
-                          {isAdmin ? "Sistema de Tokenizacion" : "Mis Ahorros"}
-                          <KeyboardHint keys="S" />
+                          Mis Solicitudes
                         </h3>
-                        <p className="text-xs text-muted-foreground">
-                          {isAdmin ? "Activos y reservas" : "Tu fondo de ahorro"}
-                        </p>
+                        <p className="text-xs text-muted-foreground">Vacaciones y permisos</p>
                       </div>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="p-4 rounded-lg bg-secondary/30">
-                      <p className="text-xs text-muted-foreground mb-1">Fondos Tokenizados</p>
-                      <p className="text-lg font-bold text-foreground">$2.5M</p>
-                      <div className="flex items-center gap-1 mt-1 text-xs text-green-500">
-                        <TrendingUp className="w-3 h-3" />
-                        <span>+3.2%</span>
-                      </div>
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="p-3 rounded-xl bg-secondary/30 text-center border border-border/50">
+                      <p className="text-2xl font-bold text-foreground">12</p>
+                      <p className="text-xs text-muted-foreground mt-1">Días de vacaciones</p>
                     </div>
-                    <div className="p-4 rounded-lg bg-secondary/30">
-                      <p className="text-xs text-muted-foreground mb-1">En Reserva</p>
-                      <p className="text-lg font-bold text-foreground">$1.75M</p>
-                      <p className="text-xs text-muted-foreground mt-1">Listo para dispersion</p>
+                    <div className="p-3 rounded-xl bg-secondary/30 text-center border border-border/50">
+                      <p className="text-2xl font-bold text-foreground">2</p>
+                      <p className="text-xs text-muted-foreground mt-1">En proceso</p>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-                    <div className="flex items-center gap-2 mb-2">
-                      <LineChart className="w-4 h-4 text-primary" />
-                      <p className="text-sm font-medium text-foreground">Rendimientos Estela</p>
+                  <button onClick={() => notifyWIP("Nueva Solicitud de Ausencia")} className="w-full mt-4 py-2 rounded-lg bg-accent/10 text-accent text-sm font-medium hover:bg-accent/20 transition-colors flex items-center justify-center gap-2 border border-accent/20">
+                    <Calendar className="w-4 h-4" />
+                    Solicitar Vacaciones
+                  </button>
+                </div>
+              )}              {/* Quadrant 3: Ahorro y Tokenizacion */}
+              {isLoading ? (
+                <SkeletonCard variant="cyan" />
+              ) : (
+                <motion.div 
+                  layoutId="quadrant-3"
+                  onClick={() => setSelectedQuadrant(3)}
+                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  className={`glass-card rounded-xl p-6 alebrije-pattern cursor-pointer relative overflow-hidden group border border-border/50 hover:border-primary/40 ${
+                    isAdmin ? "card-admin" : "card-employee"
+                  } ${!isLoading && isConnected ? "light-sweep" : ""}`}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  
+                  <div className="flex items-center justify-between mb-4 relative z-10">
+                    <div className="flex items-center gap-3">
+                      <motion.div 
+                        whileHover={{ rotate: 15 }}
+                        className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center border border-primary/20 shadow-[0_0_15px_rgba(45,212,191,0.2)]"
+                      >
+                        <Coins className="w-5 h-5 text-primary" />
+                      </motion.div>
+                      <div>
+                        <h3 className="font-semibold text-foreground flex items-center">
+                          {isAdmin ? "Sistema de Tokenizacion" : "Crecimiento y Ahorros"}
+                          <KeyboardHint keys="S" />
+                        </h3>
+                        <p className="text-xs text-muted-foreground transition-colors group-hover:text-primary/70">
+                          {isAdmin ? "Activos y reservas" : "Tu fondo de ahorro generando APY"}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Los fondos en espera generan rendimientos automaticos del 4.8% anual
+                    <motion.div whileHover={{ x: 3 }}>
+                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </motion.div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mb-5 relative z-10">
+                    <motion.div whileHover={{ scale: 1.03 }} className="p-4 rounded-xl bg-secondary/40 border border-border/50 hover:border-primary/30 transition-colors">
+                      <p className="text-xs text-muted-foreground mb-1">Fondos {isAdmin ? "Tokenizados" : "Ahorrados"}</p>
+                      <p className="text-xl font-bold text-foreground">{isAdmin ? "$2.5M" : "$12,450.00"}</p>
+                      <div className="flex items-center gap-1 mt-1 text-xs text-primary font-medium">
+                        <TrendingUp className="w-3 h-3" />
+                        <span>+3.2% mensual</span>
+                      </div>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.03 }} className="p-4 rounded-xl bg-secondary/40 border border-border/50 hover:border-primary/30 transition-colors">
+                      <p className="text-xs text-muted-foreground mb-1">En Reserva Fija</p>
+                      <p className="text-xl font-bold text-foreground">{isAdmin ? "$1.75M" : "$5,000.00"}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Saldos listos para retiro</p>
+                    </motion.div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20 relative z-10 overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl -mr-16 -mt-16" />
+                    <div className="flex items-center gap-2 mb-2">
+                       <Zap className="w-4 h-4 text-primary animate-pulse" />
+                       <p className="text-sm font-medium text-foreground">Rendimientos Inteligentes</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground relative z-10">
+                      Tus fondos en espera generan rendimientos automáticos del 4.8% APY anualizados, habilitados gracias a los smart-contracts descentralizados de la red.
                     </p>
                   </div>
-                </div>
+                </motion.div>
               )}
 
               {/* Quadrant 4: Automatizacion */}
@@ -935,6 +1050,68 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Simulacion de Recibo Overlay (User) */}
+      {showReceipt && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 p-4 backdrop-blur-md transition-all" onClick={() => setShowReceipt(false)}>
+          <motion.div 
+            initial={{ scale: 0.95, y: 20, opacity: 0 }} 
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md overflow-hidden rounded-2xl border border-border bg-card shadow-2xl relative"
+          >
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary" />
+            <div className="bg-muted/30 p-8 text-center border-b border-border/50">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/20">
+                <FileText className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground">Recibo de Nómina</h3>
+              <p className="text-sm text-muted-foreground mt-1">Periodo: Mar 01 - Mar 15, 2026</p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex justify-between border-b border-border/50 pb-3">
+                <span className="text-muted-foreground text-sm">Empresa</span>
+                <span className="font-medium text-sm">Nomillar Inc.</span>
+              </div>
+              <div className="flex justify-between border-b border-border/50 pb-3">
+                <span className="text-muted-foreground text-sm">Empleado</span>
+                <span className="font-medium text-sm">Jorge Desarrollador</span>
+              </div>
+              <div className="flex justify-between border-b border-border/50 pb-3">
+                <span className="text-muted-foreground text-sm">Salario Base</span>
+                <span className="font-medium text-sm">$4,500.00 USDC</span>
+              </div>
+              <div className="flex justify-between border-b border-border/50 pb-3">
+                <span className="text-muted-foreground text-sm">Deducciones (Impuestos)</span>
+                <span className="font-medium text-sm text-destructive">-$350.00 USDC</span>
+              </div>
+              <div className="flex justify-between pt-3 items-center">
+                <span className="font-bold text-foreground">Total Neto a Recibir</span>
+                <span className="text-2xl font-bold text-green-500">$4,150.00 USDC</span>
+              </div>
+            </div>
+            <div className="bg-muted p-4 flex gap-3 h-16">
+              <button 
+                onClick={() => setShowReceipt(false)} 
+                className="flex-1 rounded-lg border border-border bg-background py-2 text-sm font-medium hover:bg-muted/80 transition-colors"
+              >
+                Cerrar
+              </button>
+              <button 
+                onClick={() => {
+                  alert("¡Simulación exitosa! Recibo_Nomina_Mar_2026.pdf está descargado.")
+                  setShowReceipt(false)
+                }} 
+                className="flex-1 rounded-lg bg-primary text-sm font-medium text-primary-foreground hover:bg-primary/90 flex items-center justify-center gap-2 transition-all hover:shadow-lg shadow-sm"
+              >
+                <ArrowRight className="h-4 w-4 rotate-90" />
+                Descargar Recibo
+              </button>
+            </div>
+          </motion.div>
         </div>
       )}
     </div>

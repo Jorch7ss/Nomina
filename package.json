@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "backend": "cd backend && npx tsx api/server.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
