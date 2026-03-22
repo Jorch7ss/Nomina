@@ -5,6 +5,8 @@ import { motion } from "framer-motion"
 import { Navbar } from "@/components/landing/Navbar"
 import { StellarLogo } from "@/components/stellar-logo"
 import { useUIFeedback } from "@/hooks/useUIFeedback"
+import { useLanguage } from "@/components/language-provider"
+import { translations } from "@/lib/translations"
 import {
   ArrowRight,
   Shield,
@@ -36,6 +38,8 @@ interface LandingPageProps {
 
 export function LandingPage({ onGetStarted }: LandingPageProps) {
   const { notifyWIP } = useUIFeedback()
+  const { lang } = useLanguage()
+  const t = translations[lang]
   const [scrolled, setScrolled] = useState(false)
   const [activeMetric, setActiveMetric] = useState(0)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -71,10 +75,10 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
   }, [])
 
   const metrics = [
-    { value: "$2.4B+", label: "Procesado anualmente" },
-    { value: "99.99%", label: "Tiempo de actividad" },
-    { value: "< 3s", label: "Tiempo de dispersion" },
-    { value: "150K+", label: "Empleados gestionados" },
+    { value: "$2.4B+", label: t.metric1 },
+    { value: "99.99%", label: t.metric2 },
+    { value: "< 3s", label: t.metric3 },
+    { value: "150K+", label: t.metric4 },
   ]
 
   // Trust icons for rotating orbital display
@@ -92,23 +96,23 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
   const features = [
     {
       icon: Shield,
-      title: "Seguridad Institucional",
-      description: "Custodia de fondos con contratos inteligentes auditados y cumplimiento regulatorio completo.",
+      title: t.feat1Title,
+      description: t.feat1Desc,
     },
     {
       icon: Zap,
-      title: "Dispersion Instantanea",
-      description: "Procesamiento de nomina en tiempo real con confirmacion en blockchain.",
+      title: t.feat2Title,
+      description: t.feat2Desc,
     },
     {
       icon: Globe,
-      title: "Cobertura Internacional",
-      description: "Soporte para 12+ paises con conversion automatica de divisas y cumplimiento local.",
+      title: t.feat3Title,
+      description: t.feat3Desc,
     },
     {
       icon: BarChart3,
-      title: "Transparencia Total",
-      description: "Trazabilidad completa de cada transaccion con reportes en tiempo real.",
+      title: t.feat4Title,
+      description: t.feat4Desc,
     },
   ]
 
@@ -190,7 +194,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                 className="mb-6 inline-block"
               >
                 <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary shadow-[0_0_15px_rgba(var(--primary),0.1)]">
-                  ⚡ Tu nómina, a la velocidad de la luz
+                  ⚡ {t.heroBadge}
                 </div>
               </motion.div>
 
@@ -201,10 +205,10 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-4xl font-semibold tracking-tight text-balance md:text-5xl lg:text-6xl"
               >
-                Infraestructura de pagos para la{" "}
+                {t.heroTitle1}{" "}
                 <span className="relative">
                   <span className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient">
-                    nueva economía
+                    {t.heroTitle2}
                   </span>
                 </span>
               </motion.h1>
@@ -214,8 +218,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground text-pretty lg:mx-0"
               >
-                Flujos financieros sin fricción. Procesamiento de nómina global en segundos, 
-                auditable en blockchain y diseñado para la escala institucional.
+                {t.heroDesc}
               </motion.p>
 
               {/* CTA buttons */}
@@ -224,21 +227,21 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
                   onClick={() => onGetStarted("admin")}
                   className="group flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20 sm:w-auto"
                 >
-                  Comenzar ahora
+                  {t.heroCTA}
                   <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                 </button>
                 <button className="group flex w-full items-center justify-center gap-2 rounded-full border border-border bg-secondary/50 px-8 py-4 text-base font-medium transition-all hover:bg-secondary hover:border-primary/30 sm:w-auto">
                   <Play className="h-5 w-5 transition-transform group-hover:scale-110" />
-                  Ver demo
+                  {t.heroDemo}
                 </button>
               </div>
 
               {/* Quick stats */}
               <div className="mt-12 flex items-center justify-center gap-8 lg:justify-start">
                 {[
-                  { value: "500+", label: "Empresas" },
-                  { value: "12", label: "Paises" },
-                  { value: "24/7", label: "Soporte" },
+                  { value: "500+", label: t.heroStat1 },
+                  { value: "12", label: t.heroStat2 },
+                  { value: "24/7", label: t.heroStat3 },
                 ].map((stat) => (
                   <div key={stat.label} className="text-center">
                     <div className="text-2xl font-semibold text-foreground">{stat.value}</div>
@@ -363,7 +366,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
 
         {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60">
-          <span className="text-xs text-muted-foreground">Desplazar</span>
+          <span className="text-xs text-muted-foreground">{t.scroll}</span>
           <div className="h-8 w-5 rounded-full border border-border p-1">
             <div className="h-2 w-full rounded-full bg-primary animate-bounce" />
           </div>
@@ -407,11 +410,10 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
-              Infraestructura de clase mundial
+              {t.featTitle}
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Construido para escalar con las demandas de instituciones financieras 
-              y corporativos de alto volumen.
+              {t.featDesc}
             </p>
           </div>
 
@@ -665,22 +667,21 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
         <div className="relative mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl">
-              Comienza a transformar tu operacion de nomina
+              {t.ctaTitle}
             </h2>
             <p className="mt-6 text-lg text-muted-foreground">
-              Unete a mas de 500 empresas que ya confian en Stellar BAF para 
-              gestionar su nomina de manera segura y eficiente.
+              {t.ctaDesc}
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <button
                 onClick={() => onGetStarted("admin")}
                 className="group flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20 sm:w-auto"
               >
-                Solicitar demo
+                {t.ctaBtn1}
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </button>
               <button className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-8 py-4 text-base font-medium transition-all hover:bg-secondary sm:w-auto">
-                Contactar ventas
+                {t.ctaBtn2}
               </button>
             </div>
           </div>
@@ -694,11 +695,11 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
             <div className="md:col-span-1">
               <StellarLogo />
               <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-                Infraestructura de nomina de grado institucional con tecnologia blockchain.
+                {t.footerTagline}
               </p>
               <div className="mt-6 flex items-center gap-2">
                 <Lock className="h-4 w-4 text-primary" />
-                <span className="text-xs text-muted-foreground">SOC 2 Type II Certificado</span>
+                <span className="text-xs text-muted-foreground">{t.footerCert}</span>
               </div>
             </div>
             
@@ -744,7 +745,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
           
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
             <p className="text-sm text-muted-foreground">
-              2026 Stellar BAF. Todos los derechos reservados.
+              {t.footerRights}
             </p>
             <div className="flex items-center gap-6">
               <a href="#" className="text-sm text-muted-foreground transition-colors hover:text-foreground">

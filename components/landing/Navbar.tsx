@@ -3,7 +3,10 @@
 import { ArrowRight } from "lucide-react"
 import { StellarLogo } from "@/components/stellar-logo"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LanguageToggle } from "@/components/language-toggle"
 import { useUIFeedback } from "@/hooks/useUIFeedback"
+import { useLanguage } from "@/components/language-provider"
+import { translations } from "@/lib/translations"
 
 interface NavbarProps {
   scrolled: boolean
@@ -12,6 +15,15 @@ interface NavbarProps {
 
 export function Navbar({ scrolled, onGetStarted }: NavbarProps) {
   const { notifyWIP } = useUIFeedback()
+  const { lang } = useLanguage()
+  const t = translations[lang]
+
+  const navItems = [
+    { label: t.navFeatures, id: "caracteristicas" },
+    { label: t.navMetrics, id: "metricas" },
+    { label: t.navPricing, id: "precios" },
+    { label: t.navAbout,  id: "nosotros" },
+  ]
 
   return (
     <header
@@ -25,37 +37,33 @@ export function Navbar({ scrolled, onGetStarted }: NavbarProps) {
         <StellarLogo />
         
         <div className="hidden items-center gap-8 md:flex">
-          {["Caracteristicas", "Metricas", "Precios", "Nosotros"].map((item) => (
+          {navItems.map((item) => (
             <a 
-              key={item}
-              href={`#${item.toLowerCase()}`} 
-              onClick={(e) => {
-                if (item === "Nosotros" || item === "Precios" || item === "Caracteristicas" || item === "Metricas") {
-                  e.preventDefault()
-                  notifyWIP(`Sección: ${item}`)
-                }
-              }}
+              key={item.id}
+              href={`#${item.id}`} 
+              onClick={(e) => { e.preventDefault(); notifyWIP(`Sección: ${item.label}`) }}
               className="relative text-sm text-muted-foreground transition-colors hover:text-foreground group"
             >
-              {item}
+              {item.label}
               <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full" />
             </a>
           ))}
         </div>
 
         <div className="flex items-center gap-3">
+          <LanguageToggle />
           <ThemeToggle />
           <button
             onClick={() => onGetStarted("basic")}
             className="hidden text-sm text-muted-foreground transition-all hover:text-foreground sm:block"
           >
-            Iniciar sesion
+            {t.navSignIn}
           </button>
           <button
             onClick={() => onGetStarted("admin")}
             className="group flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
           >
-            Solicitar acceso
+            {t.navCTA}
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>

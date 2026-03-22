@@ -74,6 +74,55 @@ export const translations = {
     // Status
     completado: "completed",
     pendiente: "pending",
+
+    // Landing - Navbar
+    navFeatures: "Caracteristicas",
+    navMetrics: "Metricas",
+    navPricing: "Precios",
+    navAbout: "Nosotros",
+    navSignIn: "Iniciar sesion",
+    navCTA: "Solicitar acceso",
+
+    // Landing - Hero
+    heroBadge: "Tu n\u00f3mina, a la velocidad de la luz",
+    heroTitle1: "Infraestructura de pagos para la",
+    heroTitle2: "nueva econom\u00eda",
+    heroDesc: "Flujos financieros sin fricci\u00f3n. Procesamiento de n\u00f3mina global en segundos, auditable en blockchain y dise\u00f1ado para la escala institucional.",
+    heroCTA: "Comenzar ahora",
+    heroDemo: "Ver demo",
+    heroStat1: "Empresas",
+    heroStat2: "Paises",
+    heroStat3: "Soporte",
+
+    // Landing - Metrics
+    metric1: "Procesado anualmente",
+    metric2: "Tiempo de actividad",
+    metric3: "Tiempo de dispersion",
+    metric4: "Empleados gestionados",
+
+    // Landing - Features
+    featTitle: "Infraestructura de clase mundial",
+    featDesc: "Construido para escalar con las demandas de instituciones financieras y corporativos de alto volumen.",
+    feat1Title: "Seguridad Institucional",
+    feat1Desc: "Custodia de fondos con contratos inteligentes auditados y cumplimiento regulatorio completo.",
+    feat2Title: "Dispersion Instantanea",
+    feat2Desc: "Procesamiento de nomina en tiempo real con confirmacion en blockchain.",
+    feat3Title: "Cobertura Internacional",
+    feat3Desc: "Soporte para 12+ paises con conversion automatica de divisas.",
+    feat4Title: "Transparencia Total",
+    feat4Desc: "Trazabilidad completa de cada transaccion con reportes en tiempo real.",
+
+    // Landing - CTA
+    ctaTitle: "Comienza a transformar tu operacion de nomina",
+    ctaDesc: "Unete a mas de 500 empresas que ya confian en Stellar BAF para gestionar su nomina de manera segura y eficiente.",
+    ctaBtn1: "Solicitar demo",
+    ctaBtn2: "Contactar ventas",
+
+    // Landing - Footer
+    footerTagline: "Infraestructura de nomina de grado institucional con tecnologia blockchain.",
+    footerCert: "SOC 2 Type II Certificado",
+    footerRights: "2026 Stellar BAF. Todos los derechos reservados.",
+    scroll: "Desplazar",
   },
   en: {
     // Header
@@ -150,6 +199,55 @@ export const translations = {
     // Status
     completado: "completed",
     pendiente: "pending",
+
+    // Landing - Navbar
+    navFeatures: "Features",
+    navMetrics: "Metrics",
+    navPricing: "Pricing",
+    navAbout: "About",
+    navSignIn: "Sign in",
+    navCTA: "Request access",
+
+    // Landing - Hero
+    heroBadge: "Your payroll, at the speed of light",
+    heroTitle1: "Payment infrastructure for the",
+    heroTitle2: "new economy",
+    heroDesc: "Frictionless financial flows. Global payroll processing in seconds, auditable on blockchain and designed for institutional scale.",
+    heroCTA: "Get started",
+    heroDemo: "Watch demo",
+    heroStat1: "Companies",
+    heroStat2: "Countries",
+    heroStat3: "Support",
+
+    // Landing - Metrics
+    metric1: "Processed annually",
+    metric2: "Uptime",
+    metric3: "Dispersion time",
+    metric4: "Employees managed",
+
+    // Landing - Features
+    featTitle: "World-class infrastructure",
+    featDesc: "Built to scale with the demands of financial institutions and high-volume enterprises.",
+    feat1Title: "Institutional Security",
+    feat1Desc: "Fund custody with audited smart contracts and full regulatory compliance.",
+    feat2Title: "Instant Dispersion",
+    feat2Desc: "Real-time payroll processing with blockchain confirmation.",
+    feat3Title: "International Coverage",
+    feat3Desc: "Support for 12+ countries with automatic currency conversion.",
+    feat4Title: "Total Transparency",
+    feat4Desc: "Complete traceability of every transaction with real-time reports.",
+
+    // Landing - CTA
+    ctaTitle: "Start transforming your payroll operations",
+    ctaDesc: "Join more than 500 companies that already trust Stellar BAF to manage their payroll securely and efficiently.",
+    ctaBtn1: "Request demo",
+    ctaBtn2: "Contact sales",
+
+    // Landing - Footer
+    footerTagline: "Institutional-grade payroll infrastructure with blockchain technology.",
+    footerCert: "SOC 2 Type II Certified",
+    footerRights: "2026 Stellar BAF. All rights reserved.",
+    scroll: "Scroll",
   },
 } as const
 
