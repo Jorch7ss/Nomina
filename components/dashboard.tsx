@@ -62,12 +62,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
     setIsDispersing(true)
     const toastId = toast.loading("Iniciando dispersión LFPDP...", { description: "Enviando lote al dispersor Alebrije (Stellar testnet)..." })
     
-    // API del dispersor: https://github.com/Edgadafi/dispersor-nomina-alebrije — `npm run api` (puerto 3001)
-    const apiUrl =
-      process.env.NEXT_PUBLIC_DISPERSOR_API_URL ||
-      process.env.NEXT_PUBLIC_API_URL ||
-      "http://localhost:3001"
-    
+    // Mismo origen: en Vercel va a app/api/dispersar (proxy → DISPERSOR_API_URL). En local, proxy → localhost:3001.
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 120000)
     
@@ -79,7 +74,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
       }).join("\n")
       const csvStr = header + rows
 
-      const res = await fetch(`${apiUrl}/api/dispersar`, {
+      const res = await fetch("/api/dispersar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ csv: csvStr }),
@@ -113,7 +108,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
         errorMsg = "Tiempo agotado. El backend tardó demasiado en responder."
       } else if (error.message === "Failed to fetch" || error.message.includes("Load failed")) {
         errorMsg =
-          "No se pudo contactar al dispersor.\n\n→ En la carpeta dispersor-nomina-alebrije ejecuta: npm install && npm run api\n→ El frontend debe poder llegar a la URL configurada en NEXT_PUBLIC_DISPERSOR_API_URL (por defecto http://localhost:3001)."
+          "No se pudo completar la petición.\n\nLocal: levanta el dispersor (npm run api) y usa .env.local con DISPERSOR_API_URL=http://127.0.0.1:3001\nVercel: Settings → Environment Variables → DISPERSOR_API_URL = URL pública de tu API (Render, Railway, etc.)."
       } else if (error.message) {
         errorMsg = error.message
       }
