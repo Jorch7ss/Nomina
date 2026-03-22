@@ -30,7 +30,8 @@ import {
   BarChart3,
   UserMinus,
   Zap,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -59,14 +60,16 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
   const handleDisperseFunds = async () => {
     if (!escrowReady || isDispersing) return
     setIsDispersing(true)
-    const toastId = toast.loading("Iniciando dispersión en Stellar...", { description: "Preparando contratos Soroban..." })
+    const toastId = toast.loading("Iniciando dispersión LFPDP...", { description: "Enviando lote al dispersor Alebrije (Stellar testnet)..." })
     
-    // URL dinámica (de Vercel o de localhost si no hay entorno)
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+    // API del dispersor: https://github.com/Edgadafi/dispersor-nomina-alebrije — `npm run api` (puerto 3001)
+    const apiUrl =
+      process.env.NEXT_PUBLIC_DISPERSOR_API_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      "http://localhost:3001"
     
-    // Controlador para evitar quedarse colgado si el servidor local no está corriendo
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s límite
+    const timeoutId = setTimeout(() => controller.abort(), 120000)
     
     try {
       // Generar CSV dinámico para la API
@@ -87,11 +90,19 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
       const data = await res.json()
       
       if (!res.ok) throw new Error(data.error || "Error interno en el servidor de dispersión")
-      
-      toast.success("Nómina Dispersada Exitosamente", {
+
+      const txRef = (data.hash || data.txHash || "") as string
+      const explorer = data.txExplorerUrl as string | undefined
+      let description = `Empleados: ${data.count ?? "—"} · Total: ${data.total} ${data.asset ?? ""}`
+      if (txRef.length >= 16) {
+        description = `Tx: ${txRef.slice(0, 8)}...${txRef.slice(-8)}\n${description}`
+      }
+      if (explorer) description += `\n${explorer}`
+
+      toast.success("Nómina dispersada correctamente", {
         id: toastId,
-        description: `Tx Hash: ${data.hash.slice(0, 8)}...${data.hash.slice(-8)}\nTotal Pagado: ${data.total} ${data.asset}`,
-        duration: 8000
+        description,
+        duration: 10000,
       })
     } catch (error: any) {
       clearTimeout(timeoutId)
@@ -101,7 +112,8 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
       if (error.name === "AbortError") {
         errorMsg = "Tiempo agotado. El backend tardó demasiado en responder."
       } else if (error.message === "Failed to fetch" || error.message.includes("Load failed")) {
-        errorMsg = "El backend está apagado o inactivo.\n\n→ Si estás probando localmente, corre el comando: npm run backend"
+        errorMsg =
+          "No se pudo contactar al dispersor.\n\n→ En la carpeta dispersor-nomina-alebrije ejecuta: npm install && npm run api\n→ El frontend debe poder llegar a la URL configurada en NEXT_PUBLIC_DISPERSOR_API_URL (por defecto http://localhost:3001)."
       } else if (error.message) {
         errorMsg = error.message
       }
@@ -821,18 +833,28 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                   </div>
                 </div>
 
-                {/* Dispersion Button */}
-                <button 
-                  onClick={() => escrowReady ? notifyWIP("Lanzar Dispersión Masiva") : null}
+                {/* Dispersion Button — llama al API LFPDP del repo dispersor-nomina-alebrije */}
+                <button
+                  type="button"
+                  disabled={!escrowReady || isDispersing}
+                  onClick={() => handleDisperseFunds()}
                   className={`w-full mb-6 py-4 rounded-xl font-medium flex items-center justify-center gap-3 transition-all text-lg ${
-                    escrowReady 
-                      ? "btn-dispersion-ready text-foreground hover:scale-[1.02]" 
+                    escrowReady && !isDispersing
+                      ? "btn-dispersion-ready text-foreground hover:scale-[1.02]"
                       : "btn-dispersion-pending text-muted-foreground cursor-not-allowed"
                   }`}
                 >
-                  <Send className="w-5 h-5" />
-                  {escrowReady ? "Ejecutar Dispersion Masiva" : "Esperando fondos en Escrow..."}
-                  {escrowReady && <Zap className="w-4 h-4" />}
+                  {isDispersing ? (
+                    <Loader2 className="w-5 h-5 shrink-0 animate-spin" />
+                  ) : (
+                    <Send className="w-5 h-5 shrink-0" />
+                  )}
+                  {isDispersing
+                    ? "Procesando dispersión..."
+                    : escrowReady
+                      ? "Ejecutar Dispersion Masiva"
+                      : "Esperando fondos en Escrow..."}
+                  {escrowReady && !isDispersing && <Zap className="w-4 h-4 shrink-0" />}
                 </button>
 
                 {/* Drag & Drop Zone */}
