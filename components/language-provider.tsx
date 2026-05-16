@@ -20,13 +20,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Persist language preference in localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("alebrije-lang") as Lang | null
+    const saved = localStorage.getItem("nomillar-lang") as Lang | null
     if (saved === "en" || saved === "es") setLangState(saved)
   }, [])
 
   const setLang = (newLang: Lang) => {
     setLangState(newLang)
-    localStorage.setItem("alebrije-lang", newLang)
+    localStorage.setItem("nomillar-lang", newLang)
   }
 
   const toggleLang = () => setLang(lang === "es" ? "en" : "es")

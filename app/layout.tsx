@@ -7,8 +7,8 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Stellar BAF - Infraestructura de Nomina Institucional | CriptoUNAM',
-  description: 'Plataforma de nomina de alto volumen con custodia blockchain, trazabilidad completa y cumplimiento regulatorio. Desarrollado con CriptoUNAM.',
+  title: 'Nomillar — Nómina y dispersión',
+  description: 'Plataforma para gestionar nómina, dispersar pagos, consultar recibos y administrar capital humano desde un solo panel.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -39,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" suppressHydrationWarning style={{ fontSize: '108%' }}>
+    <html lang="es" suppressHydrationWarning>
       <body className="font-sans antialiased">
         <ThemeProvider
           attribute="class"

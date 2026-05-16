@@ -167,7 +167,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             Acceso empresa y empleado
           </p>
           <p className="text-muted-foreground text-sm text-center mt-3 max-w-sm mx-auto leading-relaxed">
-            Próximo paso: vincular la wallet institucional de la empresa en este flujo (Passkeys / Stellar). Mientras tanto, usa las opciones de abajo para el demo.
+            Accede como administrador de empresa o como empleado para explorar el panel de nómina.
           </p>
         </div>
 

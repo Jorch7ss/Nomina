@@ -40,7 +40,7 @@ import { useLanguage } from "@/components/language-provider"
 import { translations } from "@/lib/translations"
 import { LanguageToggle } from "@/components/language-toggle"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { StellarLogo } from "@/components/stellar-logo"
+import { NomillarLogo } from "@/components/nomillar-logo"
 
 export function Dashboard({ role, onLogout }: DashboardProps) {
   const { notifyWIP } = useUIFeedback()
@@ -61,7 +61,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
   const handleDisperseFunds = async () => {
     if (!escrowReady || isDispersing) return
     setIsDispersing(true)
-    const toastId = toast.loading("Iniciando dispersión LFPDP...", { description: "Enviando lote al dispersor Alebrije (Stellar testnet)..." })
+    const toastId = toast.loading("Iniciando dispersión...", { description: "Procesando lote de nómina en Nomillar..." })
     
     // Mismo origen: en Vercel va a app/api/dispersar (proxy → DISPERSOR_API_URL). En local, proxy → localhost:3001.
     const controller = new AbortController()
@@ -266,7 +266,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
-              <StellarLogo variant="icon" className="shrink-0" />
+              <NomillarLogo variant="icon" className="shrink-0" />
               <div className="min-w-0">
                 <h1 className="text-xl font-bold text-foreground truncate">{t.appName}</h1>
                 <p className="text-xs text-muted-foreground truncate">{t.appSubtitle}</p>
@@ -503,7 +503,7 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                         >
                           <Send className="w-4 h-4" />
                           {isDispersing
-                            ? t.enviandoStellar
+                            ? t.enviandoDispersion
                             : escrowReady
                               ? "Ejecutar dispersión masiva"
                               : t.esperandoEscrow}
@@ -694,8 +694,8 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                         <BarChart3 className="w-5 h-5 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-foreground">{t.stellarScanTitle}</h3>
-                        <p className="text-xs text-muted-foreground">{t.stellarScanDesc}</p>
+                        <h3 className="font-semibold text-foreground">{t.historialDispersionTitle}</h3>
+                        <p className="text-xs text-muted-foreground">{t.historialDispersionDesc}</p>
                       </div>
                     </div>
                   </div>
@@ -733,14 +733,13 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                     >
                       Descargar vista (demo)
                     </button>
-                    <a
-                      href="https://stellar.expert/explorer/testnet"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
+                      onClick={() => notifyWIP("Historial completo de dispersiones")}
                       className="flex-1 py-2 rounded-lg bg-primary/15 text-primary text-sm font-medium text-center border border-primary/30 hover:bg-primary/25"
                     >
-                      {t.btnExplorador}
-                    </a>
+                      {t.btnVerHistorial}
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -834,8 +833,8 @@ export function Dashboard({ role, onLogout }: DashboardProps) {
                   </div>
                   <div className="space-y-3">
                     {[
-                      { name: "Nomina Quincenal UNAM", nextRun: "15 Ene", status: "active" },
-                      { name: "Dispersion Estelar Foundation", nextRun: "01 Feb", status: "active" },
+                      { name: t.nominaQuincenalFlow, nextRun: "15 Ene", status: "active" },
+                      { name: t.dispersionMensual, nextRun: "01 Feb", status: "active" },
                     ].map((flow, i) => (
                       <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-secondary/30">
                         <div className="flex items-center gap-3">
