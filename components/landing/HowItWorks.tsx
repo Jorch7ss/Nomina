@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { Upload, ShieldCheck, Zap } from "lucide-react"
 import { SectionHeading } from "@/components/landing/SectionHeading"
 import { useLanguage } from "@/components/language-provider"
@@ -20,37 +19,26 @@ export function HowItWorks() {
 
   return (
     <section id="como-funciona" className="border-y border-border bg-muted/30 py-20 lg:py-28">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="mx-auto max-w-7xl px-6"
-      >
+      <div className="mx-auto max-w-7xl px-6">
         <SectionHeading title={t.howTitle} description={t.howDesc} />
 
         <ol className="mt-14 grid gap-8 md:grid-cols-3">
           {steps.map((step, idx) => {
             const Icon = stepIcons[idx]
             return (
-              <motion.li
+              <li
                 key={step.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.45, delay: idx * 0.08 }}
-                className="relative rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/25"
+                className="animate-stagger relative rounded-2xl border border-border bg-card p-6 transition-colors hover:border-primary/25"
+                style={{ animationDelay: `${idx * 150}ms` }}
               >
                 <span className="mb-4 inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                   {idx + 1}
                 </span>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10"
+                <div
+                  className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 transition-transform hover:scale-110"
                 >
                   <Icon className="h-5 w-5 text-primary" aria-hidden />
-                </motion.div>
+                </div>
                 <h3 className="text-lg font-medium">{step.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
                 {idx < steps.length - 1 && (
@@ -59,11 +47,11 @@ export function HowItWorks() {
                     aria-hidden
                   />
                 )}
-              </motion.li>
+              </li>
             )
           })}
         </ol>
-      </motion.div>
+      </div>
     </section>
   )
 }

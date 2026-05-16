@@ -1,28 +1,23 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { motion } from "framer-motion"
 import { Navbar } from "@/components/landing/Navbar"
-import { SectionHeading } from "@/components/landing/SectionHeading"
-import { HowItWorks } from "@/components/landing/HowItWorks"
-import { AudienceSection } from "@/components/landing/AudienceSection"
-import { ValueSection } from "@/components/landing/ValueSection"
 import { LandingFooter } from "@/components/landing/LandingFooter"
 import { useLanguage } from "@/components/language-provider"
 import { translations } from "@/lib/translations"
 import { scrollToSection } from "@/lib/scroll-to"
-import {
-  ArrowRight,
-  Shield,
-  Zap,
-  Globe,
-  BarChart3,
-  Play,
-  Check,
-  Users,
-  Calendar,
-  FileText,
-} from "lucide-react"
+import { ArrowRight, Play, Shield, ChevronDown } from "lucide-react"
+
+import { BrandTicker } from "@/components/landing/BrandTicker"
+import { FlowSimulation } from "@/components/landing/FlowSimulation"
+import { InteractiveDemo } from "@/components/landing/InteractiveDemo"
+import { RealUseCases } from "@/components/landing/RealUseCases"
+import { ProblemsVsSolutions } from "@/components/landing/ProblemsVsSolutions"
+import { ComparisonTable } from "@/components/landing/ComparisonTable"
+import { AuditTransparency } from "@/components/landing/AuditTransparency"
+import { SecurityCompliance } from "@/components/landing/SecurityCompliance"
+import { EnterpriseOnboarding } from "@/components/landing/EnterpriseOnboarding"
+import { ImpactMetrics } from "@/components/landing/ImpactMetrics"
 
 interface LandingPageProps {
   onGetStarted: (role: "admin" | "basic") => void
@@ -32,453 +27,258 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
   const { lang } = useLanguage()
   const t = translations[lang]
   const [scrolled, setScrolled] = useState(false)
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const heroRef = useRef<HTMLElement>(null)
+  const glowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener("scroll", handleScroll, { passive: true })
 
-  useEffect(() => {
-    let frame = 0
     const handleMouseMove = (e: MouseEvent) => {
-      if (!heroRef.current) return
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => {
-        if (!heroRef.current) return
-        const rect = heroRef.current.getBoundingClientRect()
-        setMousePosition({
-          x: (e.clientX - rect.left) / rect.width,
-          y: (e.clientY - rect.top) / rect.height,
-        })
-      })
+      if (glowRef.current && window.innerWidth > 1024) {
+        glowRef.current.style.transform = `translate3d(${e.clientX - 200}px, ${e.clientY - 200}px, 0)`
+      }
     }
-    const mq = window.matchMedia("(min-width: 1024px)")
-    if (mq.matches) window.addEventListener("mousemove", handleMouseMove, { passive: true })
+    window.addEventListener("mousemove", handleMouseMove)
+
     return () => {
-      cancelAnimationFrame(frame)
+      window.removeEventListener("scroll", handleScroll)
       window.removeEventListener("mousemove", handleMouseMove)
     }
   }, [])
 
-  const metrics = [
-    { value: "$2.4B+", label: t.metric1 },
-    { value: "99.99%", label: t.metric2 },
-    { value: "< 3s", label: t.metric3 },
-    { value: "150K+", label: t.metric4 },
-  ]
-
-  const productFeatures = [t.productFeature1, t.productFeature2, t.productFeature3, t.productFeature4]
-
-  const features = [
-    {
-      icon: Shield,
-      title: t.feat1Title,
-      description: t.feat1Desc,
-    },
-    {
-      icon: Zap,
-      title: t.feat2Title,
-      description: t.feat2Desc,
-    },
-    {
-      icon: Globe,
-      title: t.feat3Title,
-      description: t.feat3Desc,
-    },
-    {
-      icon: BarChart3,
-      title: t.feat4Title,
-      description: t.feat4Desc,
-    },
-  ]
-
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Navigation */}
       <Navbar scrolled={scrolled} onGetStarted={onGetStarted} />
 
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden pt-20">
-        {/* Animated background */}
-        <div className="pointer-events-none absolute inset-0">
-          {/* Gradient orbs that follow mouse slightly */}
-          <div 
-            className="absolute h-[600px] w-[600px] rounded-full bg-primary/5 blur-[100px] dark:bg-primary/8 dark:blur-[120px] transition-transform duration-1000 ease-out"
-            style={{ 
-              left: `${20 + mousePosition.x * 10}%`, 
-              top: `${10 + mousePosition.y * 10}%` 
-            }}
-          />
-          <div 
-            className="absolute h-[500px] w-[500px] rounded-full bg-accent/5 blur-[80px] dark:bg-accent/6 dark:blur-[100px] transition-transform duration-1000 ease-out"
-            style={{ 
-              right: `${15 + (1 - mousePosition.x) * 10}%`, 
-              bottom: `${20 + (1 - mousePosition.y) * 10}%` 
-            }}
-          />
-          
-          {/* Grid pattern */}
-          <div 
-            className="absolute inset-0 opacity-[0.015]"
-            style={{
-              backgroundImage: `
-                linear-gradient(to right, currentColor 1px, transparent 1px),
-                linear-gradient(to bottom, currentColor 1px, transparent 1px)
-              `,
-              backgroundSize: '60px 60px'
-            }}
-          />
+      {/* ─── HERO ─────────────────────────────────────────────────────────── */}
+      <section ref={heroRef} className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24 pb-16">
+
+        {/* Cursor glow — desktop only */}
+        <div ref={glowRef} className="glow-follow fixed top-0 left-0 w-[400px] h-[400px] z-0 pointer-events-none hidden lg:block" />
+
+        {/* Background */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-background overflow-hidden">
+          {/* Dot mesh */}
+          <div className="absolute inset-0 dot-mesh opacity-[0.05] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_90%)]" />
+          {/* Ambient glows */}
+          <div className="absolute left-1/4 top-0 w-[700px] h-[500px] opacity-10"
+               style={{ background: "radial-gradient(ellipse at top, hsl(var(--primary)) 0%, transparent 65%)" }} />
+          <div className="absolute right-0 bottom-1/3 w-[500px] h-[500px] opacity-10"
+               style={{ background: "radial-gradient(ellipse at center, hsl(var(--accent)) 0%, transparent 65%)" }} />
+          {/* Grid */}
+          <div className="absolute inset-[-40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_60%,transparent_100%)]">
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808010_1px,transparent_1px),linear-gradient(to_bottom,#80808010_1px,transparent_1px)] bg-[size:40px_40px] animate-grid-flow" />
+          </div>
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-6 py-20">
-          <div className="grid items-center gap-16 lg:grid-cols-2">
-            {/* Left content */}
-            <div className="text-center lg:text-left">
-              {/* Slogan */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="mb-6 inline-block"
-              >
-                <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-semibold text-primary shadow-[0_0_15px_rgba(var(--primary),0.1)]">
-                  ⚡ {t.heroBadge}
-                </div>
-              </motion.div>
+        {/* Content grid */}
+        <div className="relative mx-auto max-w-7xl px-6 w-full z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-              {/* Main headline */}
-              <motion.h1 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-4xl font-semibold tracking-tight text-balance md:text-5xl lg:text-6xl"
-              >
-                {t.heroTitle1}{" "}
-                <span className="relative">
-                  <span className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient">
-                    {t.heroTitle2}
-                  </span>
-                </span>
-              </motion.h1>
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground text-pretty lg:mx-0"
-              >
-                {t.heroDesc}
-              </motion.p>
+          {/* LEFT: Copy */}
+          <div className="flex flex-col items-start text-left">
 
-              {/* CTA buttons */}
-              <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
-                <button
-                  type="button"
-                  onClick={() => onGetStarted("admin")}
-                  className="btn-press group flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20 sm:w-auto"
-                >
-                  {t.heroCTA}
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => scrollToSection("como-funciona")}
-                  className="btn-press group flex w-full items-center justify-center gap-2 rounded-full border border-border bg-secondary/50 px-8 py-4 text-base font-medium transition-all hover:border-primary/30 hover:bg-secondary sm:w-auto"
-                >
-                  <Play className="h-5 w-5 transition-transform group-hover:scale-110" />
-                  {t.heroDemo}
-                </button>
-              </div>
-
-              {/* Quick stats */}
-              <div className="mt-12 flex items-center justify-center gap-8 lg:justify-start">
-                {[
-                  { value: "500+", label: t.heroStat1 },
-                  { value: "12", label: t.heroStat2 },
-                  { value: "24/7", label: t.heroStat3 },
-                ].map((stat) => (
-                  <div key={stat.label} className="text-center">
-                    <div className="text-2xl font-semibold text-foreground">{stat.value}</div>
-                    <div className="text-xs text-muted-foreground">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
+            {/* Badge */}
+            <div className="animate-stagger [animation-delay:0ms] mb-7 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-background/60 backdrop-blur-md px-4 py-1.5 text-xs font-semibold text-primary ring-1 ring-primary/10 shadow-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+              </span>
+              Infraestructura de pagos operativos · v2.0
             </div>
 
-            {/* Vista previa del periodo de nómina */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="relative w-full max-w-lg"
-            >
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                  <Calendar className="h-3.5 w-3.5" aria-hidden />
-                  {t.heroCardBadge}
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">{t.heroCardPeriod}</h3>
-                <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users className="h-4 w-4 shrink-0" aria-hidden />
-                  {t.heroCardEmployees}
-                </p>
-                <p className="mt-3 inline-flex items-center gap-2 rounded-lg bg-green-500/10 px-3 py-1.5 text-sm font-medium text-green-700 dark:text-green-400">
-                  <span className="h-2 w-2 rounded-full bg-green-500" aria-hidden />
-                  {t.heroCardStatus}
-                </p>
-                <ul className="mt-6 space-y-3 border-t border-border pt-4">
-                  {[
-                    { name: "Área operaciones", amount: "$842,120", status: "paid" as const },
-                    { name: "Área administrativa", amount: "$318,450", status: "paid" as const },
-                    { name: "Nuevos ingresos", amount: "$96,200", status: "pending" as const },
-                  ].map((row) => (
-                    <li
-                      key={row.name}
-                      className="flex items-center justify-between gap-3 rounded-lg bg-muted/40 px-3 py-2.5"
-                    >
-                      <div className="flex min-w-0 items-center gap-2">
-                        <FileText className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-                        <span className="truncate text-sm text-foreground">{row.name}</span>
-                      </div>
-                      <div className="flex shrink-0 items-center gap-2">
-                        <span className="text-sm font-medium tabular-nums">{row.amount}</span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                            row.status === "paid"
-                              ? "bg-green-500/15 text-green-700 dark:text-green-400"
-                              : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
-                          }`}
-                        >
-                          {row.status === "paid" ? t.heroCardPaid : t.heroCardPending}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
+            {/* Headline */}
+            <h1 className="animate-stagger [animation-delay:80ms] text-5xl font-bold tracking-tight md:text-6xl lg:text-[4.25rem] leading-[1.08]">
+              Paga a tu equipo<br />
+              <span className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient">
+                en tiempo real.
+              </span><br />
+              <span className="text-foreground/70 text-4xl font-semibold">Sin errores. Sin Excel.</span>
+            </h1>
 
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-60">
-          <span className="text-xs text-muted-foreground">{t.scroll}</span>
-          <div className="h-8 w-5 rounded-full border border-border p-1">
-            <div className="h-2 w-full rounded-full bg-primary animate-bounce" />
-          </div>
-        </div>
-      </section>
-
-      {/* Metrics Section */}
-      <section id="metricas" className="relative border-y border-border bg-card/50 py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="grid grid-cols-2 gap-8 md:grid-cols-4"
-          >
-            {metrics.map((metric) => (
-              <div key={metric.label} className="text-center">
-                <span className="text-3xl font-semibold text-foreground md:text-4xl lg:text-5xl">
-                  {metric.value}
-                </span>
-                <div className="mt-3 text-sm text-muted-foreground">{metric.label}</div>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="caracteristicas" className="py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-6">
-          <SectionHeading title={t.featTitle} description={t.featDesc} />
-
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4"
-          >
-            {features.map((feature, idx) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, ease: "easeOut", delay: idx * 0.1 }}
-                className="group relative rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/20">
-                  <feature.icon className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-medium">{feature.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  {feature.description}
-                </p>
-                <div className="absolute bottom-6 right-6 opacity-0 transition-opacity group-hover:opacity-100">
-                  <ArrowRight className="h-4 w-4 text-primary" />
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <HowItWorks />
-      <AudienceSection onGetStarted={onGetStarted} />
-
-      {/* Product Preview */}
-      <section id="producto" className="border-y border-border bg-card/30 py-20 lg:py-28">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="grid items-center gap-16 lg:grid-cols-2">
-            <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-            >
-              <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">{t.productTitle}</h2>
-              <p className="mt-4 text-lg leading-relaxed text-muted-foreground">{t.productDesc}</p>
-              <ul className="mt-8 space-y-4">
-                {productFeatures.map((item) => (
-                  <li key={item} className="flex items-start gap-3 group">
-                    <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 transition-colors group-hover:bg-primary/20">
-                      <Check className="h-3 w-3 text-primary" />
-                    </div>
-                    <span className="text-muted-foreground group-hover:text-foreground transition-colors">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
-                <button
-                  type="button"
-                  onClick={() => onGetStarted("admin")}
-                  className="group flex items-center gap-2 text-primary transition-colors hover:text-primary/80"
-                >
-                  {t.productCTA}
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </button>
-              </div>
-            </motion.div>
-
-            {/* Dashboard preview mockup */}
-            <motion.div 
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
-              className="relative"
-            >
-              {/* Minimal glow backdrop */}
-              <div className="absolute -inset-2 rounded-[2.5rem] bg-gradient-to-tr from-primary/10 via-accent/5 to-transparent opacity-60 blur-2xl" />
-              
-              <div className="relative aspect-[4/3] rounded-[2rem] border border-primary/10 bg-background/40 p-3 shadow-[0_8px_40px_rgba(var(--primary),0.08)] backdrop-blur-3xl transition-transform hover:scale-[1.02] hover:border-primary/20">
-                <div className="flex h-full flex-col overflow-hidden rounded-xl bg-card/80 border border-white/5 shadow-inner">
-                  {/* MacOS style window header */}
-                  <div className="flex items-center gap-2 border-b border-border/40 bg-muted/20 px-4 py-3">
-                     <div className="flex gap-1.5">
-                       <div className="h-2.5 w-2.5 rounded-full bg-destructive/70" />
-                       <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/70" />
-                       <div className="h-2.5 w-2.5 rounded-full bg-green-500/70" />
-                     </div>
-                     <div className="ml-auto flex items-center gap-2">
-                       <div className="h-3 w-32 rounded-full bg-background/60" />
-                     </div>
-                  </div>
-                  {/* Clean Mock Content */}
-                  <div className="flex-1 p-5">
-                    {/* Header mock */}
-                    <div className="mb-6 flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/30 to-accent/30 p-[2px]">
-                          <div className="h-full w-full rounded-full bg-background" />
-                        </div>
-                        <div className="space-y-2">
-                          <div className="h-3 w-28 rounded-full bg-foreground/20 animate-pulse" />
-                          <div className="h-2 w-16 rounded-full bg-muted-foreground/30" />
-                        </div>
-                      </div>
-                      <div className="h-10 w-28 rounded-full bg-primary/10" />
-                    </div>
-                    {/* Mock KPIs */}
-                    <div className="mb-8 grid grid-cols-3 gap-4">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="rounded-2xl border border-border/40 bg-background/30 p-5 transition-colors hover:bg-background/50">
-                          <div className="h-2 w-12 rounded-full bg-muted-foreground/30" />
-                          <div className={`mt-4 h-5 w-24 rounded-full ${i === 1 ? 'bg-primary/40' : 'bg-foreground/10'}`} />
-                        </div>
-                      ))}
-                    </div>
-                    {/* Mock list */}
-                    <div className="space-y-3">
-                      {[1, 2].map((i) => (
-                        <div key={i} className="flex items-center justify-between rounded-2xl border border-border/30 bg-background/20 p-4">
-                          <div className="flex items-center gap-4">
-                            <div className="h-10 w-10 rounded-full bg-muted/60" />
-                            <div className="space-y-2">
-                              <div className="h-2.5 w-32 rounded-full bg-foreground/20" />
-                              <div className="h-2 w-20 rounded-full bg-muted-foreground/30" />
-                            </div>
-                          </div>
-                          <div className="h-4 w-16 rounded-full bg-primary/20" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <ValueSection />
-
-
-      {/* CTA Section */}
-      <section className="relative overflow-hidden border-t border-border py-20 lg:py-28">
-        {/* Background decoration */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/4 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-primary/10 blur-[100px]" />
-          <div className="absolute right-1/4 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-accent/10 blur-[100px]" />
-        </div>
-        
-        <div className="relative mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl">
-              {t.ctaTitle}
-            </h2>
-            <p className="mt-6 text-lg text-muted-foreground">
-              {t.ctaDesc}
+            {/* Subheadline */}
+            <p className="animate-stagger [animation-delay:160ms] mt-6 text-lg text-muted-foreground leading-relaxed max-w-lg">
+              Nomillar dispersa comisiones, propinas y bonos a equipos operativos de forma automática y trazable — sin depender de horarios bancarios ni procesos manuales.
             </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+
+            {/* CTAs */}
+            <div className="animate-stagger [animation-delay:240ms] mt-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => onGetStarted("admin")}
-                className="btn-press group flex w-full items-center justify-center gap-2 rounded-full bg-primary px-8 py-4 text-base font-medium text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20 sm:w-auto"
+                className="group flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:scale-[1.03] hover:shadow-[0_0_36px_rgba(245,166,35,0.35)] w-full sm:w-auto"
               >
-                {t.ctaBtn1}
+                Solicitar acceso enterprise
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </button>
               <button
                 type="button"
-                onClick={() => scrollToSection("soluciones")}
-                className="btn-press flex w-full items-center justify-center gap-2 rounded-full border border-border bg-card px-8 py-4 text-base font-medium transition-all hover:bg-secondary sm:w-auto"
+                onClick={() => scrollToSection("como-funciona")}
+                className="group flex items-center justify-center gap-2 rounded-xl border border-border bg-card/50 backdrop-blur-sm px-8 py-4 text-base font-medium transition-all hover:bg-secondary hover:border-primary/30 w-full sm:w-auto"
               >
-                {t.ctaBtn2}
+                <Play className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                Ver cómo funciona
               </button>
             </div>
+
+            {/* Trust strip */}
+            <div className="animate-stagger [animation-delay:320ms] mt-10 flex flex-wrap items-center gap-6 border-t border-border/50 pt-8 w-full max-w-lg">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-primary" />
+                <span className="text-xs text-muted-foreground font-medium">Infraestructura nivel bancario</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="text-xs text-muted-foreground font-medium">Trazabilidad inmutable</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-accent" />
+                <span className="text-xs text-muted-foreground font-medium">Sin captación de depósitos</span>
+              </div>
+            </div>
           </div>
+
+          {/* RIGHT: Live dashboard mockup */}
+          <div className="animate-stagger [animation-delay:400ms] relative lg:ml-auto w-full max-w-lg hidden md:block">
+            {/* Glow halo */}
+            <div className="absolute -inset-4 rounded-[2.5rem] opacity-20"
+                 style={{ background: "radial-gradient(circle at center, hsl(var(--primary)) 0%, transparent 70%)" }} />
+
+            <div className="relative bg-card/70 backdrop-blur-md border border-border/60 rounded-3xl p-6 shadow-2xl space-y-5">
+              {/* Header */}
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground">Dispersión activa · Ciclo Semanal</p>
+                  <h3 className="text-2xl font-bold mt-0.5">$4,250,000 <span className="text-xs font-normal text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full ml-1">MXN</span></h3>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-green-500 font-medium bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                  En vivo
+                </div>
+              </div>
+
+              {/* Bar chart */}
+              <div className="h-36 flex items-end justify-between gap-2 px-1">
+                {[
+                  { h: "40%", l: "L", active: false },
+                  { h: "55%", l: "M", active: false },
+                  { h: "35%", l: "X", active: false },
+                  { h: "70%", l: "J", active: false },
+                  { h: "90%", l: "V", active: true },
+                  { h: "60%", l: "S", active: false },
+                  { h: "45%", l: "D", active: false },
+                ].map((bar, i) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                    <div className="w-full flex items-end" style={{ height: "112px" }}>
+                      <div
+                        style={{ height: bar.h, transition: `height 1s cubic-bezier(0.34,1.56,0.64,1)`, transitionDelay: `${400 + i * 100}ms` }}
+                        className={`w-full rounded-t-md relative ${bar.active
+                          ? "bg-gradient-to-t from-primary/80 to-primary shadow-[0_0_12px_rgba(245,166,35,0.4)]"
+                          : "bg-secondary/60 hover:bg-secondary"
+                        } transition-colors`}
+                      >
+                        {bar.active && (
+                          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-0.5 bg-white/80 rounded-full" />
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground font-mono">{bar.l}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Stat row */}
+              <div className="grid grid-cols-3 gap-3 pt-2 border-t border-border/50">
+                {[
+                  { label: "Empleados", value: "342" },
+                  { label: "Pagos hoy", value: "1,284" },
+                  { label: "Tasa error", value: "0%" },
+                ].map((stat, i) => (
+                  <div key={i} className="text-center">
+                    <p className="text-lg font-bold">{stat.value}</p>
+                    <p className="text-[10px] text-muted-foreground">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Recent tx */}
+              <div className="space-y-2 pt-1">
+                {[
+                  { name: "Flotilla Kavak CDMX", amount: "$124,500", status: "ok" },
+                  { name: "Comisiones Rappi Norte", amount: "$89,320", status: "ok" },
+                  { name: "Propinas Alsea Turno V", amount: "$12,100", status: "pending" },
+                ].map((tx, i) => (
+                  <div key={i} className="flex items-center justify-between text-xs bg-secondary/30 rounded-lg px-3 py-2">
+                    <span className="text-muted-foreground truncate max-w-[160px]">{tx.name}</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="font-semibold">{tx.amount}</span>
+                      <span className={`w-1.5 h-1.5 rounded-full ${tx.status === "ok" ? "bg-green-500" : "bg-amber-500 animate-pulse"}`} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll hint */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-muted-foreground/50 animate-bounce">
+          <span className="text-[10px] font-medium tracking-widest uppercase">Explorar</span>
+          <ChevronDown className="w-4 h-4" />
+        </div>
+      </section>
+
+      <BrandTicker />
+      <ImpactMetrics />
+      <ProblemsVsSolutions />
+      <FlowSimulation />
+      <AuditTransparency />
+      <RealUseCases />
+      <ComparisonTable />
+      <SecurityCompliance />
+      <EnterpriseOnboarding />
+      <InteractiveDemo />
+
+      {/* ─── CTA FINAL ──────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden border-t border-border py-24 bg-background">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[300px] opacity-10"
+               style={{ background: "radial-gradient(ellipse at center, hsl(var(--primary)) 0%, transparent 70%)" }} />
+        </div>
+        <div className="relative mx-auto max-w-3xl px-6 text-center">
+          <div className="inline-flex items-center gap-2 mb-6 text-xs font-semibold text-primary border border-primary/20 bg-primary/5 rounded-full px-4 py-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Para empresas con equipos operativos
+          </div>
+          <h2 className="text-4xl font-bold tracking-tight md:text-5xl leading-tight">
+            Tu operación merece<br />
+            <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              infraestructura real.
+            </span>
+          </h2>
+          <p className="mt-6 text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Deja de usar Excel para pagar comisiones, propinas y bonos variables. Nomillar es la capa operativa que tu equipo de finanzas necesita hoy.
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button
+              type="button"
+              onClick={() => onGetStarted("admin")}
+              className="group flex items-center gap-2 rounded-xl bg-primary px-10 py-4 text-base font-semibold text-primary-foreground hover:shadow-[0_0_36px_rgba(245,166,35,0.3)] hover:scale-[1.03] transition-all"
+            >
+              Registrar empresa
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollToSection("como-funciona")}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+            >
+              Ver cómo funciona primero
+            </button>
+          </div>
+          <p className="mt-8 text-xs text-muted-foreground/60">
+            Sin costo de integración inicial · Sin costo por empleado en piloto · Sin captación de depósitos
+          </p>
         </div>
       </section>
 

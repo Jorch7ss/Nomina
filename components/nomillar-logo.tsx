@@ -26,6 +26,7 @@ export function NomillarLogo({ variant = "full", className = "" }: NomillarLogoP
         className="h-11 min-h-[44px] w-auto max-w-[220px] object-contain drop-shadow-sm transition-all dark:drop-shadow-[0_0_10px_rgba(255,165,30,0.3)]"
       />
       <span className="text-lg font-bold tracking-tight text-foreground">Nomillar</span>
+      <div className="h-2 w-2 rounded-full bg-[#F5A623] animate-ping-custom" />
     </div>
   )
 }

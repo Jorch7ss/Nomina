@@ -4,95 +4,103 @@
 @custom-variant dark (&:is(.dark *));
 
 :root, .light {
-  /* Nomillar - tema claro */
-  --background: #ffffff;
-  --foreground: #000000; /* Stellar Coal */
-  --card: #f9fafb;
-  --card-foreground: #000000;
+  /* Nomillar - Premium Light Theme (Soft off-white) */
+  --background: #fcfcfc;
+  --foreground: #09090b;
+  --card: #ffffff;
+  --card-foreground: #09090b;
   --popover: #ffffff;
-  --popover-foreground: #000000;
+  --popover-foreground: #09090b;
   
-  --primary: #ffa51e; /* Stellar Yolk - Core Identity */
+  --primary: #ffa51e; /* Stellar Yolk */
   --primary-foreground: #000000; 
-  --secondary: #f3f4f6; /* Subtle gray */
-  --secondary-foreground: #000000;
-  --muted: #f3f4f6;
-  --muted-foreground: #4b5563;
-  --accent: #7d00ff; /* Stellar Violet - For strategic sections */
+  --secondary: #f4f4f5; 
+  --secondary-foreground: #09090b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #7d00ff; 
   --accent-foreground: #ffffff;
-  --destructive: #dc2626;
-  --destructive-foreground: #ffffff;
-  --border: #e1e1e1;
-  --input: #e1e1e1;
-  --ring: #ffa51e; /* Focus rings in yellow */
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #ffa51e; 
   
-  --chart-1: #ffa51e; /* Yolk */
-  --chart-2: #7d00ff; /* Violet */
-  --chart-3: #ff5500; /* Ochre */
-  --chart-4: #00aa46; /* Moss */
-  --chart-5: #000000; /* Coal */
+  --chart-1: #ffa51e; 
+  --chart-2: #7d00ff; 
+  --chart-3: #ff5500; 
+  --chart-4: #00aa46; 
+  --chart-5: #e879f9; 
   --radius: 0.625rem;
   
   --sidebar: #ffffff;
-  --sidebar-foreground: #000000;
+  --sidebar-foreground: #09090b;
   --sidebar-primary: #ffa51e;
   --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #7d00ff;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #e1e1e1;
+  --sidebar-accent: #f4f4f5;
+  --sidebar-accent-foreground: #09090b;
+  --sidebar-border: #e4e4e7;
   --sidebar-ring: #ffa51e;
   
-  /* Stellar BAF brand colors (Light adapted) */
   --stellar-teal: #00aa46;
   --stellar-blue: #7d00ff;
   --stellar-dark: #000000;
-  --glass-bg: #ffffffcc;
-  --glass-border: #e1e1e166;
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(228, 228, 231, 0.8);
   --neon-cyan: #00c9a7;
   --neon-fuchsia: #e879f9;
   --neon-violet: #a78bfa;
 }
 
 .dark {
-  --background: oklch(0.11 0.01 240);
-  --foreground: oklch(0.96 0.005 240);
-  --card: oklch(0.14 0.01 240);
-  --card-foreground: oklch(0.96 0.005 240);
-  --popover: oklch(0.12 0.01 240);
-  --popover-foreground: oklch(0.96 0.005 240);
+  /* Nomillar - Premium Enterprise Theme (Soft Midnight) */
+  --background: #09090b;
+  --foreground: #fafafa;
+  --card: #09090b;
+  --card-foreground: #fafafa;
+  --popover: #09090b;
+  --popover-foreground: #fafafa;
+  
   --primary: #ffa51e;
-  --primary-foreground: #000000;
-  --secondary: oklch(0.18 0.01 240);
-  --secondary-foreground: oklch(0.96 0.005 240);
-  --muted: oklch(0.20 0.01 240);
-  --muted-foreground: oklch(0.60 0.01 240);
-  --accent: oklch(0.65 0.14 200);
-  --accent-foreground: oklch(0.96 0.005 240);
-  --destructive: oklch(0.55 0.20 25);
-  --destructive-foreground: oklch(0.96 0.005 240);
-  --border: oklch(0.24 0.015 240);
-  --input: oklch(0.16 0.01 240);
-  --ring: oklch(0.72 0.17 175);
-  --chart-1: oklch(0.72 0.17 175);
-  --chart-2: oklch(0.65 0.14 200);
-  --chart-3: oklch(0.58 0.12 260);
-  --chart-4: oklch(0.70 0.15 150);
-  --chart-5: oklch(0.65 0.10 45);
-  --sidebar: oklch(0.12 0.01 240);
-  --sidebar-foreground: oklch(0.96 0.005 240);
-  --sidebar-primary: oklch(0.72 0.17 175);
-  --sidebar-primary-foreground: oklch(0.11 0.01 240);
-  --sidebar-accent: oklch(0.18 0.01 240);
-  --sidebar-accent-foreground: oklch(0.96 0.005 240);
-  --sidebar-border: oklch(0.24 0.015 240);
-  --sidebar-ring: oklch(0.72 0.17 175);
-  /* Glass / acentos en modo oscuro (antes heredaban blanco de :root) */
-  --glass-bg: oklch(0.17 0.02 240 / 0.82);
-  --glass-border: oklch(0.30 0.02 240 / 0.55);
-  --neon-cyan: oklch(0.72 0.17 175);
-  --neon-fuchsia: oklch(0.65 0.22 330);
-  --neon-violet: oklch(0.62 0.22 285);
+  --primary-foreground: #09090b; 
+  --secondary: #27272a; 
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a; 
+  --accent-foreground: #fafafa;
+  --destructive: #7f1d1d;
+  --destructive-foreground: #fafafa;
+  --border: #27272a;
+  --input: #27272a;
+  --ring: #ffa51e; 
+  
+  --chart-1: #ffa51e; 
+  --chart-2: #7d00ff; 
+  --chart-3: #ff5500; 
+  --chart-4: #00aa46; 
+  --chart-5: #e879f9; 
+  
+  --sidebar: #09090b;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #ffa51e;
+  --sidebar-primary-foreground: #09090b;
+  --sidebar-accent: #27272a;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #27272a;
+  --sidebar-ring: #ffa51e;
+  
+  --stellar-teal: #00aa46;
+  --stellar-blue: #7d00ff;
+  --stellar-dark: #000000;
+  --glass-bg: rgba(9, 9, 11, 0.7);
+  --glass-border: rgba(39, 39, 42, 0.8);
+  --neon-cyan: #00c9a7;
+  --neon-fuchsia: #e879f9;
+  --neon-violet: #a78bfa;
 }
+
+/* Variables restored successfully */
 
 @theme inline {
   --font-sans: 'Geist', 'Geist Fallback';
@@ -644,9 +652,92 @@
 }
 
 /* Typing cursor */
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes ping-custom {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 166, 35, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(245, 166, 35, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 166, 35, 0);
+  }
+}
+
+.animate-ping-custom {
+  animation: ping-custom 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes fade-in-up-stagger {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger {
+  opacity: 0;
+  animation: fade-in-up-stagger 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes grid-flow {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(40px); }
+}
+
+.animate-grid-flow {
+  animation: grid-flow 3s linear infinite;
+}
+
+@keyframes progress-grow {
+  from { width: 0; }
+  to { width: var(--progress-width); }
+}
+
+.animate-progress {
+  animation: progress-grow 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: 0.8s;
+}
+
+.dot-mesh {
+  background-image: radial-gradient(#F5A623 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.glow-follow {
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(245, 166, 35, 0.06) 0%, transparent 70%);
+  transition: transform 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ticker-mask {
+  mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+.card-hover-glow {
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-hover-glow:hover {
+  border-color: rgba(245, 166, 35, 0.3) !important;
+  box-shadow: 0 0 24px rgba(245, 166, 35, 0.12) !important;
+}
+
+.dark .card-hover-glow:hover {
+  background-color: #1C1C1C !important;
+}
+
+.card-hover-glow:hover .icon-scale {
+  transform: scale(1.08);
 }
 
 .cursor-blink::after {
